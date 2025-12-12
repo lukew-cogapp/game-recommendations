@@ -45,13 +45,17 @@ export const TAG_PRESETS = [
 	{ ids: "80,230", label: "Tactical", category: "Genre" }, // tactical + tactical-rpg
 	{ ids: "639", label: "Roguelike", category: "Genre" },
 	{ ids: "259", label: "Metroidvania", category: "Genre" },
+	{ ids: "213,180,49967", label: "City Builder", category: "Genre" }, // city-builder + base-building + colony-sim
 	{ ids: "1", label: "Survival", category: "Genre" },
+	{ ids: "37", label: "Sandbox", category: "Genre" },
+	{ ids: "107", label: "Family Friendly", category: "Genre" },
 	{ ids: "16,17", label: "Horror", category: "Genre" }, // horror + survival-horror
 	// Gameplay Style
 	{ ids: "36", label: "Open World", category: "Gameplay" },
 	{ ids: "102,175,101", label: "Turn-Based", category: "Gameplay" }, // turn-based + turn-based-combat + turn-based-strategy
 	{ ids: "99,61", label: "Isometric", category: "Gameplay" }, // isometric + top-down
 	{ ids: "6", label: "Exploration", category: "Gameplay" },
+	{ ids: "125", label: "Crafting", category: "Gameplay" },
 	{ ids: "49", label: "Difficult", category: "Gameplay" },
 	{
 		ids: "115,336,29716,6670",
