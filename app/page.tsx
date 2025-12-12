@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import { Filters, SortSelect } from "@/components/Filters";
 import { GameGrid } from "@/components/GameGrid";
+import { GameGridWithLoadMore } from "@/components/GameGridWithLoadMore";
 import { LuckyButton } from "@/components/LuckyButton";
-import { Pagination } from "@/components/Pagination";
 import { SearchBar } from "@/components/SearchBar";
-import { DEFAULT_PLATFORMS } from "@/lib/constants";
+import { DEFAULT_PLATFORMS, type MultiplayerMode } from "@/lib/constants";
 import { getGames, getGenres } from "@/lib/rawg";
 import type { GameOrdering, GamesResponse } from "@/types/game";
 
@@ -20,6 +20,7 @@ interface HomeProps {
 		platform?: string;
 		unreleased?: string;
 		lucky?: string;
+		multiplayer?: string;
 	}>;
 }
 
@@ -36,9 +37,10 @@ function hashSeed(seed: string): number {
 
 export default async function Home({ searchParams }: HomeProps) {
 	const params = await searchParams;
-	const page = Number(params.page) || 1;
 	const ordering = (params.ordering || "-rating") as GameOrdering;
 	const isLucky = Boolean(params.lucky);
+	const selectedMultiplayerMode =
+		(params.multiplayer as MultiplayerMode) || null;
 
 	// Build dates filter in RAWG format: "YYYY-MM-DD,YYYY-MM-DD"
 	const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
@@ -60,18 +62,22 @@ export default async function Home({ searchParams }: HomeProps) {
 		dates = `1970-01-01,${oneYearFromNow}`;
 	}
 
+	// When sorting by metacritic, ensure games have a score (avoid nulls first)
+	const metacriticFilter =
+		params.metacritic || (ordering === "-metacritic" ? "1,100" : undefined);
+
 	const baseFilters = {
 		ordering,
 		genres: params.genre,
 		// Use selected platform or default to current-gen only
 		platforms: params.platform || DEFAULT_PLATFORMS,
 		dates,
+		// Only pass user-selected tags to API (multiplayer is filtered client-side)
 		tags: params.tags,
-		metacritic: params.metacritic,
+		metacritic: metacriticFilter,
 	};
 
 	let gamesData: GamesResponse;
-	let totalPages = 0;
 
 	if (isLucky) {
 		// Get count first to know how many pages exist
@@ -104,13 +110,13 @@ export default async function Home({ searchParams }: HomeProps) {
 			gamesData = { count: 0, results: [], next: null, previous: null };
 		}
 	} else {
+		// Fetch more results when multiplayer filter is active (to compensate for client-side filtering)
+		const pageSize = selectedMultiplayerMode ? 100 : 20;
 		gamesData = await getGames({
 			...baseFilters,
-			page,
-			page_size: 20,
+			page: 1,
+			page_size: pageSize,
 		});
-		// RAWG API limits pagination - cap at 500 pages (10,000 results)
-		totalPages = Math.min(Math.ceil(gamesData.count / 20), 500);
 	}
 
 	const genres = await getGenres();
@@ -149,13 +155,14 @@ export default async function Home({ searchParams }: HomeProps) {
 				</Suspense>
 			</div>
 
-			<GameGrid games={gamesData.results} />
-
-			{totalPages > 1 && (
-				<Pagination
-					currentPage={page}
-					totalPages={totalPages}
-					searchParams={params}
+			{isLucky ? (
+				<GameGrid games={gamesData.results} />
+			) : (
+				<GameGridWithLoadMore
+					initialGames={gamesData.results}
+					initialCount={gamesData.count}
+					filters={baseFilters}
+					selectedMultiplayerMode={selectedMultiplayerMode}
 				/>
 			)}
 		</div>

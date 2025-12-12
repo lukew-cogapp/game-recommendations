@@ -1,10 +1,44 @@
+// Platform slug to short label mapping (for game cards)
+export const PLATFORM_LABELS: Record<string, string> = {
+	pc: "PC",
+	playstation: "PS",
+	xbox: "XB",
+	nintendo: "NS",
+	mac: "Mac",
+	linux: "Lin",
+};
+
+// Tag IDs for NSFW content filtering
+export const NSFW_TAG_IDS = new Set([44, 312, 192, 1081]); // Nudity, NSFW, Mature, Adult
+
+// Multiplayer tag IDs (used for filtering)
+export const MULTIPLAYER_TAGS = {
+	singleplayer: [31],
+	coop: [18, 9, 411], // co-op + online-co-op + cooperative
+	local: [72, 75, 198], // local-multiplayer + local-co-op + split-screen
+} as const;
+
+export type MultiplayerMode = keyof typeof MULTIPLAYER_TAGS | null;
+
+// Detect which multiplayer mode is selected from tag string
+export function detectMultiplayerMode(
+	tags: string | undefined,
+): MultiplayerMode {
+	if (!tags) return null;
+	const tagSet = new Set(tags.split(",").map(Number));
+
+	if (MULTIPLAYER_TAGS.singleplayer.some((id) => tagSet.has(id)))
+		return "singleplayer";
+	if (MULTIPLAYER_TAGS.coop.some((id) => tagSet.has(id))) return "coop";
+	if (MULTIPLAYER_TAGS.local.some((id) => tagSet.has(id))) return "local";
+
+	return null;
+}
+
 // Tag presets for filtering (grouped by category)
 // IDs are combined where multiple tags represent the same concept
+// Note: Multiplayer is a separate filter, not in TAG_PRESETS
 export const TAG_PRESETS = [
-	// Multiplayer (includes singleplayer for filtering purposes)
-	{ ids: "31", label: "Singleplayer", category: "Multiplayer" },
-	{ ids: "18,9,411", label: "Co-op", category: "Multiplayer" }, // co-op + online-co-op + cooperative
-	{ ids: "72,75,198", label: "Local Multiplayer", category: "Multiplayer" }, // local-multiplayer + local-co-op + split-screen
 	// Genre
 	{ ids: "24,468", label: "RPG", category: "Genre" }, // rpg + role-playing
 	{ ids: "97", label: "Action RPG", category: "Genre" },

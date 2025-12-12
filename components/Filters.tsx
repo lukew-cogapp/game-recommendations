@@ -8,6 +8,7 @@ import {
 	TAG_PRESETS,
 } from "@/lib/rawg";
 import type { Genre } from "@/types/game";
+import { MultiplayerFilter } from "./MultiplayerFilter";
 import { TagPicker } from "./TagPicker";
 
 interface FiltersProps {
@@ -104,6 +105,8 @@ export function Filters({ genres }: FiltersProps) {
 						</option>
 					))}
 				</select>
+
+				<MultiplayerFilter />
 
 				<select
 					value={currentGenre}

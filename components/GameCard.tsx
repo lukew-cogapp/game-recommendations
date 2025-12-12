@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NSFW_TAG_IDS, PLATFORM_LABELS } from "@/lib/constants";
 import type { Game } from "@/types/game";
 import { MetacriticBadge, PlatformBadge, UnreleasedBadge } from "./Badge";
 
@@ -7,25 +8,13 @@ interface GameCardProps {
 	game: Game;
 }
 
-const platformIcons: Record<string, string> = {
-	pc: "PC",
-	playstation: "PS",
-	xbox: "XB",
-	nintendo: "NS",
-	mac: "Mac",
-	linux: "Lin",
-};
-
-// Tag IDs for NSFW content
-const NSFW_TAG_IDS = new Set([44, 312, 192, 1081]); // Nudity, NSFW, Mature, Adult
-
 function getPlatformLabels(platforms: Game["platforms"]) {
 	if (!platforms) return [];
 	const seen = new Set<string>();
 	return platforms
 		.map((p) => {
 			const slug = p.platform.slug.toLowerCase();
-			for (const [key, label] of Object.entries(platformIcons)) {
+			for (const [key, label] of Object.entries(PLATFORM_LABELS)) {
 				if (slug.includes(key) && !seen.has(label)) {
 					seen.add(label);
 					return label;
@@ -101,7 +90,12 @@ export function GameCard({ game }: GameCardProps) {
 							</span>
 						)}
 						{game.released && (
-							<span>{new Date(game.released).getFullYear()}</span>
+							<span>
+								{new Date(game.released).toLocaleDateString("en-US", {
+									month: "short",
+									year: "numeric",
+								})}
+							</span>
 						)}
 					</div>
 					{game.genres && game.genres.length > 0 && (

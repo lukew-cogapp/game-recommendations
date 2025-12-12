@@ -20,13 +20,7 @@ const tagsByCategory = TAG_PRESETS.reduce(
 	{} as Record<string, (typeof TAG_PRESETS)[number][]>,
 );
 
-const categoryOrder = [
-	"Multiplayer",
-	"Genre",
-	"Gameplay",
-	"Setting",
-	"Narrative",
-];
+const categoryOrder = ["Genre", "Gameplay", "Setting", "Narrative"];
 
 export function TagPicker({ selectedTags, onChange }: TagPickerProps) {
 	const [isOpen, setIsOpen] = useState(false);

@@ -241,7 +241,7 @@ function TagsList({ tags }: { tags: GameDetails["tags"] }) {
 		<div className="bg-card rounded-lg p-6 border border-border">
 			<h3 className="text-lg font-semibold text-foreground mb-4">Tags</h3>
 			<div className="flex flex-wrap gap-2">
-				{tags?.slice(0, 10).map((tag) => (
+				{tags?.map((tag) => (
 					<Link
 						key={tag.id}
 						href={`/?tags=${tag.id}`}
