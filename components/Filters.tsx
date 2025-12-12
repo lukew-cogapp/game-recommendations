@@ -21,6 +21,7 @@ export function Filters({ genres }: FiltersProps) {
 		currentGenre,
 		currentPlatform,
 		currentTags,
+		currentMatchAllTags,
 		currentMetacritic,
 		activeDatePreset,
 		hasFilters,
@@ -79,10 +80,16 @@ export function Filters({ genres }: FiltersProps) {
 	}
 
 	if (activeDatePreset) {
-		const label =
-			activeDatePreset === "6months" ? "Last 6 Months" : "Unreleased";
+		const dateLabels: Record<string, string> = {
+			"6months": "Last 6 Months",
+			"12months": "Last 12 Months",
+			"2years": "Last 2 Years",
+			"5years": "Last 5 Years",
+			"10years": "Last 10 Years",
+			unreleased: "Unreleased",
+		};
 		activeFilters.push({
-			label,
+			label: dateLabels[activeDatePreset] || activeDatePreset,
 			onRemove: () => applyDatePreset(""),
 		});
 	}
@@ -125,6 +132,10 @@ export function Filters({ genres }: FiltersProps) {
 				<TagPicker
 					selectedTags={currentTags}
 					onChange={(tags) => updateFilter("tags", tags)}
+					matchAll={currentMatchAllTags}
+					onMatchAllChange={(matchAll) =>
+						updateFilter("matchAllTags", matchAll)
+					}
 				/>
 
 				<select
@@ -148,6 +159,10 @@ export function Filters({ genres }: FiltersProps) {
 				>
 					<option value="">All Time</option>
 					<option value="6months">Last 6 Months</option>
+					<option value="12months">Last 12 Months</option>
+					<option value="2years">Last 2 Years</option>
+					<option value="5years">Last 5 Years</option>
+					<option value="10years">Last 10 Years</option>
 					<option value="unreleased">Unreleased</option>
 				</select>
 

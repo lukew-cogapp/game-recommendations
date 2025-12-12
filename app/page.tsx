@@ -35,6 +35,7 @@ interface HomeProps {
 		dateFrom?: string;
 		dateTo?: string;
 		tags?: string;
+		matchAllTags?: string;
 		metacritic?: string;
 		platform?: string;
 		unreleased?: string;
@@ -56,7 +57,6 @@ function hashSeed(seed: string): number {
 
 export default async function Home({ searchParams }: HomeProps) {
 	const params = await searchParams;
-	const ordering = (params.ordering || "-metacritic") as GameOrdering;
 	const isLucky = Boolean(params.lucky);
 	const selectedMultiplayerMode =
 		(params.multiplayer as MultiplayerMode) || null;
@@ -81,6 +81,8 @@ export default async function Home({ searchParams }: HomeProps) {
 		dates = `1970-01-01,${oneYearFromNow}`;
 	}
 
+	const ordering = (params.ordering || "-rating") as GameOrdering;
+
 	// When sorting by metacritic, ensure games have a score (avoid nulls first)
 	const metacriticFilter =
 		params.metacritic || (ordering === "-metacritic" ? "1,100" : undefined);
@@ -92,9 +94,11 @@ export default async function Home({ searchParams }: HomeProps) {
 	//   so we get properly sorted results (e.g., top-rated co-op games)
 	// - Otherwise: just use user tags (or undefined)
 	let apiTags: string | undefined;
+	const matchAllTags = params.matchAllTags === "true";
 	const needsClientSideMultiplayerFilter = Boolean(
 		params.tags && selectedMultiplayerMode,
 	);
+	const needsClientSideTagFilter = Boolean(params.tags && matchAllTags);
 
 	if (params.tags) {
 		// User has tags selected - use those, multiplayer handled client-side if needed
@@ -112,6 +116,14 @@ export default async function Home({ searchParams }: HomeProps) {
 		dates,
 		tags: apiTags,
 		metacritic: metacriticFilter,
+	};
+
+	// Generate hint for empty results
+	const getEmptyHint = () => {
+		if (ordering === "-metacritic" && (params.dateFrom || params.unreleased)) {
+			return "Metacritic scores are often delayed for recent games. Try sorting by Rating instead.";
+		}
+		return undefined;
 	};
 
 	let gamesData: GamesResponse;
@@ -148,7 +160,9 @@ export default async function Home({ searchParams }: HomeProps) {
 		}
 	} else {
 		// Fetch more results when client-side filtering is needed (to compensate for filtering losses)
-		const pageSize = needsClientSideMultiplayerFilter ? 100 : 20;
+		const needsMoreResults =
+			needsClientSideMultiplayerFilter || needsClientSideTagFilter;
+		const pageSize = needsMoreResults ? 100 : 20;
 		gamesData = await getGames({
 			...baseFilters,
 			page: 1,
@@ -202,6 +216,8 @@ export default async function Home({ searchParams }: HomeProps) {
 					selectedMultiplayerMode={
 						needsClientSideMultiplayerFilter ? selectedMultiplayerMode : null
 					}
+					matchAllTags={needsClientSideTagFilter}
+					emptyHint={getEmptyHint()}
 				/>
 			)}
 		</div>

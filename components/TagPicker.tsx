@@ -6,6 +6,8 @@ import { TAG_PRESETS } from "@/lib/constants";
 interface TagPickerProps {
 	selectedTags: string;
 	onChange: (tags: string) => void;
+	matchAll: boolean;
+	onMatchAllChange: (matchAll: boolean) => void;
 }
 
 // Group tags by category
@@ -22,7 +24,12 @@ const tagsByCategory = TAG_PRESETS.reduce(
 
 const categoryOrder = ["Genre", "Gameplay", "Setting", "Narrative"];
 
-export function TagPicker({ selectedTags, onChange }: TagPickerProps) {
+export function TagPicker({
+	selectedTags,
+	onChange,
+	matchAll,
+	onMatchAllChange,
+}: TagPickerProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -119,6 +126,15 @@ export function TagPicker({ selectedTags, onChange }: TagPickerProps) {
 					aria-label="Tag filters"
 					className="absolute top-full left-0 mt-1 w-64 bg-card border border-border rounded-lg shadow-xl z-50 py-2 max-h-80 overflow-y-auto"
 				>
+					<label className="flex items-center gap-3 px-3 py-2 border-b border-border mb-1 cursor-pointer hover:bg-card-hover">
+						<input
+							type="checkbox"
+							checked={matchAll}
+							onChange={(e) => onMatchAllChange(e.target.checked)}
+							className="w-4 h-4 rounded border-border bg-background text-gold focus:ring-gold focus:ring-offset-background accent-gold"
+						/>
+						<span className="text-sm text-foreground">Match all tags</span>
+					</label>
 					{categoryOrder.map((category) => (
 						<fieldset key={category} className="border-0 p-0 m-0">
 							<legend className="px-3 py-1 text-xs font-semibold text-muted uppercase tracking-wider">
@@ -144,7 +160,7 @@ export function TagPicker({ selectedTags, onChange }: TagPickerProps) {
 						<button
 							type="button"
 							onClick={() => onChange("")}
-							className="w-full text-left px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-card-hover border-t border-border mt-1"
+							className="w-full text-left px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-card-hover border-t border-border"
 						>
 							Clear all tags
 						</button>
