@@ -25,7 +25,7 @@ npm run typecheck  # Run TypeScript checks
 ### API Client (`lib/rawg.ts`)
 
 - Server-side only (uses `RAWG_API_KEY` env var)
-- All fetches use 1-hour cache revalidation
+- All fetches use 24-hour cache revalidation
 - Constants extracted to `lib/constants.ts`
 
 ### Tag System
@@ -38,7 +38,7 @@ The RAWG `/games/{slug}/stores` endpoint returns `store_id`, not full store obje
 
 ### NSFW Handling
 
-Games with tags `44`, `312`, `192`, `1081` (Nudity, NSFW, Mature, Adult) have images blurred in `GameCard.tsx`.
+Games with tags `312`, `786`, `785`, `1402` (NSFW, hentai, erotic, porn) have images lightly blurred in `GameCard.tsx`. General mature/nudity/sexual-content/adult tags are excluded to avoid blurring games like The Witcher 3, Persona 5, or Genesis Noir.
 
 ### Pagination
 

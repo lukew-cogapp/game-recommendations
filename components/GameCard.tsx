@@ -46,7 +46,7 @@ export function GameCard({ game, priority = false }: GameCardProps) {
 							src={game.background_image}
 							alt={game.name}
 							fill
-							className={`object-cover ${isNsfw ? "blur-xl" : ""}`}
+							className={`object-cover ${isNsfw ? "blur-[2px]" : ""}`}
 							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
 							priority={priority}
 							quality={70}
@@ -57,8 +57,10 @@ export function GameCard({ game, priority = false }: GameCardProps) {
 						</div>
 					)}
 					{isNsfw && (
-						<div className="absolute inset-0 flex items-center justify-center bg-background/50">
-							<span className="text-sm text-muted">Mature Content</span>
+						<div className="absolute inset-0 flex items-center justify-center">
+							<span className="text-sm text-foreground bg-background/80 px-3 py-1 rounded-full">
+								Mature Content
+							</span>
 						</div>
 					)}
 					{isUnreleased && (

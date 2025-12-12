@@ -23,8 +23,9 @@ export const PLATFORM_LABELS: Record<string, string> = {
 	linux: "Lin",
 };
 
-// Tag IDs for NSFW content filtering
-export const NSFW_TAG_IDS = new Set([44, 312, 192, 1081]); // Nudity, NSFW, Mature, Adult
+// Tag IDs for explicit adult content (blur images)
+// Explicit games have nsfw/hentai/erotic/porn - "adult" alone catches legit games like Genesis Noir
+export const NSFW_TAG_IDS = new Set([312, 786, 785, 1402]); // NSFW, hentai, erotic, porn
 
 // Multiplayer tag IDs (used for filtering)
 export const MULTIPLAYER_TAGS = {
