@@ -24,7 +24,7 @@ export function useFilters() {
 	const currentTags = searchParams.get("tags") || "";
 	const currentMetacritic = searchParams.get("metacritic") || "";
 	const currentUnreleased = searchParams.get("unreleased") === "true";
-	const currentOrdering = searchParams.get("ordering") || "-rating";
+	const currentOrdering = searchParams.get("ordering") || "-metacritic";
 
 	const updateFilter = useCallback(
 		(key: FilterKey, value: string | boolean) => {
@@ -84,7 +84,7 @@ export function useFilters() {
 
 	const hasFilters =
 		currentGenre ||
-		currentOrdering !== "-rating" ||
+		currentOrdering !== "-metacritic" ||
 		currentPlatform ||
 		currentDateFrom ||
 		currentDateTo ||

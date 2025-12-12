@@ -4,7 +4,11 @@ import { GameGrid } from "@/components/GameGrid";
 import { GameGridWithLoadMore } from "@/components/GameGridWithLoadMore";
 import { LuckyButton } from "@/components/LuckyButton";
 import { SearchBar } from "@/components/SearchBar";
-import { DEFAULT_PLATFORMS, type MultiplayerMode } from "@/lib/constants";
+import {
+	DEFAULT_PLATFORMS,
+	MULTIPLAYER_TAGS,
+	type MultiplayerMode,
+} from "@/lib/constants";
 import { getGames, getGenres } from "@/lib/rawg";
 import type { GameOrdering, GamesResponse } from "@/types/game";
 
@@ -37,7 +41,7 @@ function hashSeed(seed: string): number {
 
 export default async function Home({ searchParams }: HomeProps) {
 	const params = await searchParams;
-	const ordering = (params.ordering || "-rating") as GameOrdering;
+	const ordering = (params.ordering || "-metacritic") as GameOrdering;
 	const isLucky = Boolean(params.lucky);
 	const selectedMultiplayerMode =
 		(params.multiplayer as MultiplayerMode) || null;
@@ -66,14 +70,32 @@ export default async function Home({ searchParams }: HomeProps) {
 	const metacriticFilter =
 		params.metacritic || (ordering === "-metacritic" ? "1,100" : undefined);
 
+	// Determine which tags to send to API:
+	// - If user selected tags AND multiplayer: only send user tags (avoid RAWG's OR behavior)
+	//   and filter multiplayer client-side
+	// - If user selected multiplayer but NO tags: send multiplayer tags to API
+	//   so we get properly sorted results (e.g., top-rated co-op games)
+	// - Otherwise: just use user tags (or undefined)
+	let apiTags: string | undefined;
+	const needsClientSideMultiplayerFilter = Boolean(
+		params.tags && selectedMultiplayerMode,
+	);
+
+	if (params.tags) {
+		// User has tags selected - use those, multiplayer handled client-side if needed
+		apiTags = params.tags;
+	} else if (selectedMultiplayerMode) {
+		// Only multiplayer selected - pass to API for proper sorting
+		apiTags = MULTIPLAYER_TAGS[selectedMultiplayerMode].join(",");
+	}
+
 	const baseFilters = {
 		ordering,
 		genres: params.genre,
 		// Use selected platform or default to current-gen only
 		platforms: params.platform || DEFAULT_PLATFORMS,
 		dates,
-		// Only pass user-selected tags to API (multiplayer is filtered client-side)
-		tags: params.tags,
+		tags: apiTags,
 		metacritic: metacriticFilter,
 	};
 
@@ -110,8 +132,8 @@ export default async function Home({ searchParams }: HomeProps) {
 			gamesData = { count: 0, results: [], next: null, previous: null };
 		}
 	} else {
-		// Fetch more results when multiplayer filter is active (to compensate for client-side filtering)
-		const pageSize = selectedMultiplayerMode ? 100 : 20;
+		// Fetch more results when client-side filtering is needed (to compensate for filtering losses)
+		const pageSize = needsClientSideMultiplayerFilter ? 100 : 20;
 		gamesData = await getGames({
 			...baseFilters,
 			page: 1,
@@ -162,7 +184,9 @@ export default async function Home({ searchParams }: HomeProps) {
 					initialGames={gamesData.results}
 					initialCount={gamesData.count}
 					filters={baseFilters}
-					selectedMultiplayerMode={selectedMultiplayerMode}
+					selectedMultiplayerMode={
+						needsClientSideMultiplayerFilter ? selectedMultiplayerMode : null
+					}
 				/>
 			)}
 		</div>

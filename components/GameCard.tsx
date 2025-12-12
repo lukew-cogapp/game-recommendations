@@ -81,6 +81,11 @@ export function GameCard({ game }: GameCardProps) {
 								</span>
 								<span className="sr-only">Rating:</span>
 								{game.rating.toFixed(1)}
+								{game.ratings_count > 0 && (
+									<span className="text-muted">
+										({game.ratings_count.toLocaleString()})
+									</span>
+								)}
 							</span>
 						)}
 						{game.metacritic && <MetacriticBadge score={game.metacritic} />}
