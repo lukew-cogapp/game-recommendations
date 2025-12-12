@@ -1,32 +1,35 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const RAWG_API_URL = "https://api.rawg.io/api";
-const API_KEY = process.env.RAWG_API_KEY;
+import { getGames } from "@/lib/rawg";
+import type { GameOrdering } from "@/types/game";
 
 export async function GET(request: NextRequest) {
 	const searchParams = request.nextUrl.searchParams;
 
-	// Build params for RAWG API
-	const rawgParams = new URLSearchParams();
-	rawgParams.set("key", API_KEY || "");
+	try {
+		const data = await getGames({
+			page: searchParams.get("page")
+				? Number(searchParams.get("page"))
+				: undefined,
+			page_size: searchParams.get("page_size")
+				? Number(searchParams.get("page_size"))
+				: undefined,
+			ordering: (searchParams.get("ordering") as GameOrdering) || undefined,
+			genres: searchParams.get("genres") || undefined,
+			platforms: searchParams.get("platforms") || undefined,
+			search: searchParams.get("search") || undefined,
+			dates: searchParams.get("dates") || undefined,
+			tags: searchParams.get("tags") || undefined,
+			metacritic: searchParams.get("metacritic") || undefined,
+		});
 
-	// Forward all query params except our internal ones
-	for (const [key, value] of searchParams.entries()) {
-		if (value) {
-			rawgParams.set(key, value);
-		}
+		return NextResponse.json(data, {
+			headers: {
+				"Cache-Control":
+					"public, s-maxage=86400, stale-while-revalidate=604800",
+			},
+		});
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "Unknown error";
+		return NextResponse.json({ error: message }, { status: 500 });
 	}
-
-	const url = `${RAWG_API_URL}/games?${rawgParams.toString()}`;
-	const response = await fetch(url, { next: { revalidate: 3600 } });
-
-	if (!response.ok) {
-		return NextResponse.json(
-			{ error: `RAWG API error: ${response.status}` },
-			{ status: response.status },
-		);
-	}
-
-	const data = await response.json();
-	return NextResponse.json(data);
 }

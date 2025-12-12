@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { InfoRow } from "@/components/ui";
-import { type GameStore, STORE_ICONS } from "@/lib/rawg";
+import { STORE_ICONS } from "@/lib/constants";
+import type { GameStore } from "@/lib/rawg";
 import type { GameDetails } from "@/types/game";
 
 interface GameSidebarProps {

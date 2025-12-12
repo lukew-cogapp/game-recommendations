@@ -5,22 +5,12 @@ import type {
 	Genre,
 	GenresResponse,
 } from "@/types/game";
-
-// Re-export constants for backwards compatibility
-export {
-	METACRITIC_SCORES,
-	ORDERINGS,
-	PLATFORMS,
-	STORE_ICONS,
-	STORE_INFO,
-	TAG_PRESETS,
-} from "./constants";
-
 import { STORE_INFO } from "./constants";
 
 const RAWG_API_URL = "https://api.rawg.io/api";
 const API_KEY = process.env.RAWG_API_KEY;
 
+// Fetch with Next.js Data Cache - caches for 24 hours
 async function fetchRawg<T>(
 	endpoint: string,
 	params: Record<string, string | number | undefined> = {},
@@ -35,7 +25,9 @@ async function fetchRawg<T>(
 	}
 
 	const url = `${RAWG_API_URL}${endpoint}?${searchParams.toString()}`;
-	const response = await fetch(url, { next: { revalidate: 3600 } });
+	const response = await fetch(url, {
+		next: { revalidate: 86400, tags: ["rawg"] },
+	});
 
 	if (!response.ok) {
 		throw new Error(`RAWG API error: ${response.status}`);

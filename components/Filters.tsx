@@ -6,7 +6,7 @@ import {
 	ORDERINGS,
 	PLATFORMS,
 	TAG_PRESETS,
-} from "@/lib/rawg";
+} from "@/lib/constants";
 import type { Genre } from "@/types/game";
 import { MultiplayerFilter } from "./MultiplayerFilter";
 import { TagPicker } from "./TagPicker";
