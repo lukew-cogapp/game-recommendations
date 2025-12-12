@@ -24,8 +24,9 @@ import {
 	MULTIPLAYER_TAGS,
 	type MultiplayerMode,
 } from "@/lib/constants";
+import { applyFilters, getTagGroups } from "@/lib/filters";
 import { getGames, getGenres } from "@/lib/rawg";
-import type { GameOrdering, GamesResponse } from "@/types/game";
+import type { Game, GameOrdering, GamesResponse } from "@/types/game";
 
 interface HomeProps {
 	searchParams: Promise<{
@@ -129,35 +130,61 @@ export default async function Home({ searchParams }: HomeProps) {
 	let gamesData: GamesResponse;
 
 	if (isLucky) {
+		// Determine if we need client-side filtering for lucky picks
+		const luckyNeedsFiltering =
+			needsClientSideMultiplayerFilter || needsClientSideTagFilter;
+		const luckyTagGroups = needsClientSideTagFilter
+			? getTagGroups(params.tags)
+			: [];
+		const luckyMultiplayerMode = needsClientSideMultiplayerFilter
+			? selectedMultiplayerMode
+			: null;
+
 		// Get count first to know how many pages exist
 		const countData = await getGames({ ...baseFilters, page: 1, page_size: 1 });
-		const maxPage = Math.min(Math.ceil(countData.count / 20), 500);
+		const pageSize = luckyNeedsFiltering ? 100 : 20;
+		const maxPage = Math.min(Math.ceil(countData.count / pageSize), 500);
+
+		let luckyGame: Game | null = null;
 
 		if (maxPage > 0) {
-			// Use seed to pick a deterministic but "random" page
 			const seed = params.lucky || "default";
 			const hash = hashSeed(seed);
-			const randomPage = (hash % maxPage) + 1;
 
-			// Fetch that page
-			const pageData = await getGames({
-				...baseFilters,
-				page: randomPage,
-				page_size: 20,
-			});
+			// Try up to 10 pages to find a matching game
+			for (let attempt = 0; attempt < 10 && !luckyGame; attempt++) {
+				const randomPage = ((hash + attempt * 7) % maxPage) + 1;
 
-			// Pick a random game from the page
-			const randomIndex = hash % pageData.results.length;
-			gamesData = {
-				count: countData.count,
-				results:
-					pageData.results.length > 0 ? [pageData.results[randomIndex]] : [],
-				next: null,
-				previous: null,
-			};
-		} else {
-			gamesData = { count: 0, results: [], next: null, previous: null };
+				const pageData = await getGames({
+					...baseFilters,
+					page: randomPage,
+					page_size: pageSize,
+				});
+
+				let candidates = pageData.results;
+
+				// Apply client-side filters if needed
+				if (luckyNeedsFiltering) {
+					candidates = applyFilters(candidates, {
+						multiplayerMode: luckyMultiplayerMode,
+						tagGroups: luckyTagGroups,
+					});
+				}
+
+				if (candidates.length > 0) {
+					// Pick a random game from filtered results
+					const randomIndex = hash % candidates.length;
+					luckyGame = candidates[randomIndex];
+				}
+			}
 		}
+
+		gamesData = {
+			count: countData.count,
+			results: luckyGame ? [luckyGame] : [],
+			next: null,
+			previous: null,
+		};
 	} else {
 		// Fetch more results when client-side filtering is needed (to compensate for filtering losses)
 		const needsMoreResults =

@@ -20,11 +20,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { MultiplayerMode } from "@/lib/constants";
 import {
-	MULTIPLAYER_TAGS,
-	type MultiplayerMode,
-	TAG_PRESETS,
-} from "@/lib/constants";
+	filterByMultiplayer,
+	filterByTagGroups,
+	getTagGroups,
+} from "@/lib/filters";
 import type { Game } from "@/types/game";
 import { GameCard } from "./GameCard";
 import { EmptyState } from "./ui";
@@ -37,49 +38,6 @@ interface GameGridWithLoadMoreProps {
 	/** Enable AND filtering between tag presets (OR within each preset) */
 	matchAllTags: boolean;
 	emptyHint?: string;
-}
-
-function filterByMultiplayer(games: Game[], mode: MultiplayerMode): Game[] {
-	if (!mode) return games;
-
-	// Get the required tag IDs for the selected mode
-	const requiredTagIds = MULTIPLAYER_TAGS[mode];
-
-	return games.filter((game) => {
-		if (!game.tags) return false; // Can't verify without tag info
-
-		const gameTagIds = new Set(game.tags.map((t) => t.id));
-
-		// Game must have at least one of the required multiplayer tags
-		return requiredTagIds.some((id) => gameTagIds.has(id));
-	});
-}
-
-// Parse selected tag IDs into preset groups for AND filtering
-function getTagGroups(tags: string | undefined): number[][] {
-	if (!tags) return [];
-	const selectedIds = new Set(tags.split(",").filter(Boolean));
-	const groups: number[][] = [];
-
-	for (const preset of TAG_PRESETS) {
-		const presetIds = preset.ids.split(",");
-		if (presetIds.every((id) => selectedIds.has(id))) {
-			groups.push(presetIds.map(Number));
-		}
-	}
-	return groups;
-}
-
-function filterByTagGroups(games: Game[], tagGroups: number[][]): Game[] {
-	if (tagGroups.length === 0) return games;
-
-	return games.filter((game) => {
-		if (!game.tags) return false;
-		const gameTagIds = new Set(game.tags.map((t) => t.id));
-		// Game must match ALL groups (AND between groups)
-		// Each group requires at least ONE matching tag (OR within group)
-		return tagGroups.every((group) => group.some((id) => gameTagIds.has(id)));
-	});
 }
 
 export function GameGridWithLoadMore({
