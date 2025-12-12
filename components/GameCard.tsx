@@ -6,6 +6,7 @@ import { MetacriticBadge, PlatformBadge, UnreleasedBadge } from "./Badge";
 
 interface GameCardProps {
 	game: Game;
+	priority?: boolean;
 }
 
 function getPlatformLabels(platforms: Game["platforms"]) {
@@ -30,7 +31,7 @@ function hasNsfwTags(tags: Game["tags"]): boolean {
 	return tags.some((tag) => NSFW_TAG_IDS.has(tag.id));
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({ game, priority = false }: GameCardProps) {
 	const isUnreleased = game.released && new Date(game.released) > new Date();
 	const isNsfw = hasNsfwTags(game.tags);
 
@@ -47,6 +48,8 @@ export function GameCard({ game }: GameCardProps) {
 							fill
 							className={`object-cover ${isNsfw ? "blur-xl" : ""}`}
 							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+							priority={priority}
+							quality={70}
 						/>
 					) : (
 						<div className="absolute inset-0 flex items-center justify-center text-muted">

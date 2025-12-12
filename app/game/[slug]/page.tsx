@@ -37,22 +37,24 @@ export default async function GamePage({ params }: GamePageProps) {
 			<GameHero game={game} />
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-				<div className="lg:col-span-2">
-					<h2 className="text-xl font-bold text-foreground mb-4">About</h2>
-					<div className="prose prose-invert max-w-none">
-						<p className="text-foreground/80 leading-relaxed whitespace-pre-line">
-							{game.description_raw || "No description available."}
-						</p>
-					</div>
+				<div className="lg:col-span-2 space-y-8">
+					<section>
+						<h2 className="text-xl font-bold text-foreground mb-4">About</h2>
+						<div className="prose prose-invert max-w-none">
+							<p className="text-foreground/80 leading-relaxed whitespace-pre-line">
+								{game.description_raw || "No description available."}
+							</p>
+						</div>
+					</section>
+
+					<ScreenshotGallery
+						screenshots={screenshots.results}
+						gameName={game.name}
+					/>
 				</div>
 
 				<GameSidebar game={game} stores={stores.results} />
 			</div>
-
-			<ScreenshotGallery
-				screenshots={screenshots.results}
-				gameName={game.name}
-			/>
 		</div>
 	);
 }

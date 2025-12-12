@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MULTIPLAYER_TAGS, type MultiplayerMode } from "@/lib/constants";
 import type { Game } from "@/types/game";
 import { GameCard } from "./GameCard";
+import { EmptyState } from "./ui";
 
 interface GameGridWithLoadMoreProps {
 	initialGames: Game[];
@@ -109,18 +110,14 @@ export function GameGridWithLoadMore({
 	}, [filteredGames.length, hasMore, isLoading, loadMore, page]);
 
 	if (filteredGames.length === 0 && !isLoading) {
-		return (
-			<output className="block text-center py-12 text-muted">
-				No games found
-			</output>
-		);
+		return <EmptyState />;
 	}
 
 	return (
 		<section aria-label="Game results">
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-				{filteredGames.map((game) => (
-					<GameCard key={game.id} game={game} />
+				{filteredGames.map((game, index) => (
+					<GameCard key={game.id} game={game} priority={index < 4} />
 				))}
 			</div>
 

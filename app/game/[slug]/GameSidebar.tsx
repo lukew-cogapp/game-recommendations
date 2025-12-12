@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InfoRow } from "@/components/ui";
 import { type GameStore, STORE_ICONS } from "@/lib/rawg";
 import type { GameDetails } from "@/types/game";
 
@@ -34,54 +35,36 @@ function GameInfoCard({
 		<div className="bg-card rounded-lg p-6 border border-border">
 			<h3 className="text-lg font-semibold text-foreground mb-4">Game Info</h3>
 			<dl className="space-y-3">
-				<div>
-					<dt className="text-muted text-sm">Platforms</dt>
-					<dd className="text-foreground">{platformNames}</dd>
-				</div>
+				<InfoRow label="Platforms">{platformNames}</InfoRow>
 				{game.genres && game.genres.length > 0 && (
-					<div>
-						<dt className="text-muted text-sm">Genres</dt>
-						<dd className="text-foreground">
-							{game.genres.map((g) => g.name).join(", ")}
-						</dd>
-					</div>
+					<InfoRow label="Genres">
+						{game.genres.map((g) => g.name).join(", ")}
+					</InfoRow>
 				)}
 				{game.developers && game.developers.length > 0 && (
-					<div>
-						<dt className="text-muted text-sm">Developer</dt>
-						<dd className="text-foreground">
-							{game.developers.map((d) => d.name).join(", ")}
-						</dd>
-					</div>
+					<InfoRow label="Developer">
+						{game.developers.map((d) => d.name).join(", ")}
+					</InfoRow>
 				)}
 				{game.publishers && game.publishers.length > 0 && (
-					<div>
-						<dt className="text-muted text-sm">Publisher</dt>
-						<dd className="text-foreground">
-							{game.publishers.map((p) => p.name).join(", ")}
-						</dd>
-					</div>
+					<InfoRow label="Publisher">
+						{game.publishers.map((p) => p.name).join(", ")}
+					</InfoRow>
 				)}
 				{game.playtime > 0 && (
-					<div>
-						<dt className="text-muted text-sm">Average Playtime</dt>
-						<dd className="text-foreground">{game.playtime} hours</dd>
-					</div>
+					<InfoRow label="Average Playtime">{game.playtime} hours</InfoRow>
 				)}
 				{game.website && (
-					<div>
-						<dt className="text-muted text-sm">Website</dt>
-						<dd>
-							<a
-								href={game.website}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-gold hover:text-gold-hover break-all"
-							>
-								Visit Website
-							</a>
-						</dd>
-					</div>
+					<InfoRow label="Website">
+						<a
+							href={game.website}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-gold hover:text-gold-hover break-all"
+						>
+							Visit Website
+						</a>
+					</InfoRow>
 				)}
 			</dl>
 		</div>

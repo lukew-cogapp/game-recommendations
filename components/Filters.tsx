@@ -10,13 +10,11 @@ import {
 import type { Genre } from "@/types/game";
 import { MultiplayerFilter } from "./MultiplayerFilter";
 import { TagPicker } from "./TagPicker";
+import { selectClassName } from "./ui";
 
 interface FiltersProps {
 	genres: Genre[];
 }
-
-const selectClass =
-	"px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer";
 
 export function Filters({ genres }: FiltersProps) {
 	const {
@@ -95,7 +93,7 @@ export function Filters({ genres }: FiltersProps) {
 				<select
 					value={currentPlatform}
 					onChange={(e) => updateFilter("platform", e.target.value)}
-					className={selectClass}
+					className={selectClassName}
 					aria-label="Filter by platform"
 				>
 					<option value="">All Platforms</option>
@@ -111,7 +109,7 @@ export function Filters({ genres }: FiltersProps) {
 				<select
 					value={currentGenre}
 					onChange={(e) => updateFilter("genre", e.target.value)}
-					className={selectClass}
+					className={selectClassName}
 					aria-label="Filter by genre"
 				>
 					<option value="">All Genres</option>
@@ -132,7 +130,7 @@ export function Filters({ genres }: FiltersProps) {
 				<select
 					value={currentMetacritic}
 					onChange={(e) => updateFilter("metacritic", e.target.value)}
-					className={selectClass}
+					className={selectClassName}
 					aria-label="Filter by Metacritic score"
 				>
 					{METACRITIC_SCORES.map((score) => (
@@ -145,7 +143,7 @@ export function Filters({ genres }: FiltersProps) {
 				<select
 					value={activeDatePreset}
 					onChange={(e) => applyDatePreset(e.target.value)}
-					className={selectClass}
+					className={selectClassName}
 					aria-label="Filter by release date"
 				>
 					<option value="">All Time</option>
@@ -205,7 +203,7 @@ export function SortSelect() {
 		<select
 			value={currentOrdering}
 			onChange={(e) => updateFilter("ordering", e.target.value)}
-			className={selectClass}
+			className={selectClassName}
 			aria-label="Sort games by"
 		>
 			{ORDERINGS.map((order) => (
