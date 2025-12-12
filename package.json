@@ -16,8 +16,7 @@
 		"format": "biome format --write .",
 		"check": "biome check --write .",
 		"typecheck": "tsc --noEmit",
-		"precommit": "npm run typecheck && npm run lint",
-		"lighthouse": "lhci autorun"
+		"precommit": "npm run typecheck && npm run lint"
 	},
 	"dependencies": {
 		"next": "16.0.10",
@@ -26,7 +25,6 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
-		"@lhci/cli": "^0.15.1",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
 		"@types/react": "^19",
