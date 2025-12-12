@@ -42,6 +42,7 @@ interface HomeProps {
 		unreleased?: string;
 		lucky?: string;
 		multiplayer?: string;
+		search?: string;
 	}>;
 }
 
@@ -117,6 +118,7 @@ export default async function Home({ searchParams }: HomeProps) {
 		dates,
 		tags: apiTags,
 		metacritic: metacriticFilter,
+		search: params.search,
 	};
 
 	// Generate hint for empty results
@@ -125,6 +127,17 @@ export default async function Home({ searchParams }: HomeProps) {
 			return "Metacritic scores are often delayed for recent games. Try sorting by Rating instead.";
 		}
 		return undefined;
+	};
+
+	// Generate hint for lucky empty results
+	const getLuckyEmptyHint = () => {
+		if (ordering === "-metacritic") {
+			return "Many games lack Metacritic scores. Try sorting by Rating instead.";
+		}
+		if (needsClientSideTagFilter || needsClientSideMultiplayerFilter) {
+			return "Your filter combination is very specific. Try removing some filters.";
+		}
+		return "No matching games found. Try adjusting your filters.";
 	};
 
 	let gamesData: GamesResponse;
@@ -203,10 +216,12 @@ export default async function Home({ searchParams }: HomeProps) {
 		<div>
 			<div className="mb-8">
 				<h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-					Discover Games
+					{params.search ? `Results for "${params.search}"` : "Discover Games"}
 				</h1>
 				<p className="text-muted mb-4">
-					Browse and find your next favorite game
+					{params.search
+						? "Refine with filters below"
+						: "Browse and find your next favorite game"}
 				</p>
 				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 					<Suspense fallback={null}>
@@ -234,7 +249,7 @@ export default async function Home({ searchParams }: HomeProps) {
 			</div>
 
 			{isLucky ? (
-				<GameGrid games={gamesData.results} />
+				<GameGrid games={gamesData.results} emptyHint={getLuckyEmptyHint()} />
 			) : (
 				<GameGridWithLoadMore
 					initialGames={gamesData.results}

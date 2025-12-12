@@ -36,21 +36,6 @@ export const MULTIPLAYER_TAGS = {
 
 export type MultiplayerMode = keyof typeof MULTIPLAYER_TAGS | null;
 
-// Detect which multiplayer mode is selected from tag string
-export function detectMultiplayerMode(
-	tags: string | undefined,
-): MultiplayerMode {
-	if (!tags) return null;
-	const tagSet = new Set(tags.split(",").map(Number));
-
-	if (MULTIPLAYER_TAGS.singleplayer.some((id) => tagSet.has(id)))
-		return "singleplayer";
-	if (MULTIPLAYER_TAGS.coop.some((id) => tagSet.has(id))) return "coop";
-	if (MULTIPLAYER_TAGS.local.some((id) => tagSet.has(id))) return "local";
-
-	return null;
-}
-
 // Tag presets for filtering (grouped by category)
 // IDs are combined where multiple tags represent the same concept
 // Note: Multiplayer is a separate filter, not in TAG_PRESETS

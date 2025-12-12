@@ -52,19 +52,6 @@ export async function getGames(
 	});
 }
 
-export async function searchGames(
-	query: string,
-	page = 1,
-	platforms?: string,
-): Promise<GamesResponse> {
-	return fetchRawg<GamesResponse>("/games", {
-		search: query,
-		page,
-		page_size: 20,
-		platforms,
-	});
-}
-
 export async function getGame(slug: string): Promise<GameDetails> {
 	return fetchRawg<GameDetails>(`/games/${slug}`);
 }

@@ -1,18 +1,16 @@
 import type { Game } from "@/types/game";
 import { GameCard } from "./GameCard";
+import { EmptyState } from "./ui";
 
 interface GameGridProps {
 	games: Game[];
 	title?: string;
+	emptyHint?: string;
 }
 
-export function GameGrid({ games, title }: GameGridProps) {
+export function GameGrid({ games, title, emptyHint }: GameGridProps) {
 	if (games.length === 0) {
-		return (
-			<output className="block text-center py-12 text-muted">
-				No games found
-			</output>
-		);
+		return <EmptyState hint={emptyHint} />;
 	}
 
 	return (
