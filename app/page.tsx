@@ -1,3 +1,18 @@
+/**
+ * Home Page - Game Discovery
+ *
+ * Filtering Strategy:
+ * RAWG API uses OR logic for tags (tags=A,B returns games with A OR B, not A AND B).
+ * This creates issues when combining user tags with multiplayer tags.
+ *
+ * Solution:
+ * - Multiplayer-only: Pass multiplayer tags to API for proper sorting (e.g., top co-op games)
+ * - User tags + Multiplayer: Pass only user tags to API, filter multiplayer client-side
+ *
+ * This ensures "Western Co-op games" returns games that are BOTH Western AND Co-op.
+ * See GameGridWithLoadMore.tsx for client-side filtering implementation.
+ */
+
 import { Suspense } from "react";
 import { Filters, SortSelect } from "@/components/Filters";
 import { GameGrid } from "@/components/GameGrid";

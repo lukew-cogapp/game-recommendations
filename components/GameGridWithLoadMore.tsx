@@ -1,3 +1,21 @@
+/**
+ * GameGridWithLoadMore - Paginated game grid with client-side multiplayer filtering
+ *
+ * This component handles:
+ * 1. Displaying games in a grid layout
+ * 2. "Load More" pagination via client-side API calls
+ * 3. Client-side multiplayer filtering (when user tags + multiplayer are both selected)
+ * 4. Auto-fetching more results when filtered count drops below 8 games
+ *
+ * Client-side filtering is needed because RAWG uses OR logic for tags.
+ * When selectedMultiplayerMode is passed, games are filtered to require
+ * at least one of the multiplayer tags for that mode.
+ *
+ * The page size is increased to 100 when filtering is active to compensate
+ * for games removed by the filter. Auto-fetch stops after 5 pages to
+ * prevent excessive API calls.
+ */
+
 "use client";
 
 import { useCallback, useEffect, useState } from "react";

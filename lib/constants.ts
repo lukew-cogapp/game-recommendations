@@ -1,3 +1,18 @@
+/**
+ * App Constants
+ *
+ * Contains tag IDs, platform mappings, and filter presets for the RAWG API.
+ * Tag IDs are from RAWG and can be looked up via their /tags endpoint.
+ *
+ * MULTIPLAYER_TAGS: Used for the dedicated multiplayer filter. These can be
+ * sent to the API directly OR used for client-side filtering depending on
+ * whether user tags are also selected (see app/page.tsx for logic).
+ *
+ * TAG_PRESETS: Curated tag combinations for the tag picker dropdown.
+ * Multiple IDs can be combined (comma-separated) when tags represent
+ * the same concept (e.g., "RPG" + "role-playing").
+ */
+
 // Platform slug to short label mapping (for game cards)
 export const PLATFORM_LABELS: Record<string, string> = {
 	pc: "PC",
