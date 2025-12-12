@@ -1,65 +1,163 @@
-import Image from "next/image";
+import { Suspense } from "react";
+import { Filters, SortSelect } from "@/components/Filters";
+import { GameGrid } from "@/components/GameGrid";
+import { LuckyButton } from "@/components/LuckyButton";
+import { Pagination } from "@/components/Pagination";
+import { SearchBar } from "@/components/SearchBar";
+import { DEFAULT_PLATFORMS } from "@/lib/constants";
+import { getGames, getGenres } from "@/lib/rawg";
+import type { GameOrdering, GamesResponse } from "@/types/game";
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+interface HomeProps {
+	searchParams: Promise<{
+		genre?: string;
+		ordering?: string;
+		page?: string;
+		dateFrom?: string;
+		dateTo?: string;
+		tags?: string;
+		metacritic?: string;
+		platform?: string;
+		unreleased?: string;
+		lucky?: string;
+	}>;
+}
+
+// Simple hash function for deterministic random from seed
+function hashSeed(seed: string): number {
+	let hash = 0;
+	for (let i = 0; i < seed.length; i++) {
+		const char = seed.charCodeAt(i);
+		hash = (hash << 5) - hash + char;
+		hash = hash & hash;
+	}
+	return Math.abs(hash);
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+	const params = await searchParams;
+	const page = Number(params.page) || 1;
+	const ordering = (params.ordering || "-rating") as GameOrdering;
+	const isLucky = Boolean(params.lucky);
+
+	// Build dates filter in RAWG format: "YYYY-MM-DD,YYYY-MM-DD"
+	const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+	const oneYearFromNow = new Date(Date.now() + 365 * 86400000)
+		.toISOString()
+		.split("T")[0];
+
+	let dates: string;
+	if (params.unreleased === "true") {
+		// Unreleased only: tomorrow to 1 year from now
+		dates = `${tomorrow},${oneYearFromNow}`;
+	} else if (params.dateFrom || params.dateTo) {
+		// User specified dates
+		const from = params.dateFrom || "1970-01-01";
+		const to = params.dateTo || oneYearFromNow;
+		dates = `${from},${to}`;
+	} else {
+		// Default: all time up to 1 year from now
+		dates = `1970-01-01,${oneYearFromNow}`;
+	}
+
+	const baseFilters = {
+		ordering,
+		genres: params.genre,
+		// Use selected platform or default to current-gen only
+		platforms: params.platform || DEFAULT_PLATFORMS,
+		dates,
+		tags: params.tags,
+		metacritic: params.metacritic,
+	};
+
+	let gamesData: GamesResponse;
+	let totalPages = 0;
+
+	if (isLucky) {
+		// Get count first to know how many pages exist
+		const countData = await getGames({ ...baseFilters, page: 1, page_size: 1 });
+		const maxPage = Math.min(Math.ceil(countData.count / 20), 500);
+
+		if (maxPage > 0) {
+			// Use seed to pick a deterministic but "random" page
+			const seed = params.lucky || "default";
+			const hash = hashSeed(seed);
+			const randomPage = (hash % maxPage) + 1;
+
+			// Fetch that page
+			const pageData = await getGames({
+				...baseFilters,
+				page: randomPage,
+				page_size: 20,
+			});
+
+			// Pick a random game from the page
+			const randomIndex = hash % pageData.results.length;
+			gamesData = {
+				count: countData.count,
+				results:
+					pageData.results.length > 0 ? [pageData.results[randomIndex]] : [],
+				next: null,
+				previous: null,
+			};
+		} else {
+			gamesData = { count: 0, results: [], next: null, previous: null };
+		}
+	} else {
+		gamesData = await getGames({
+			...baseFilters,
+			page,
+			page_size: 20,
+		});
+		// RAWG API limits pagination - cap at 500 pages (10,000 results)
+		totalPages = Math.min(Math.ceil(gamesData.count / 20), 500);
+	}
+
+	const genres = await getGenres();
+
+	return (
+		<div>
+			<div className="mb-8">
+				<h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+					Discover Games
+				</h1>
+				<p className="text-muted mb-4">
+					Browse and find your next favorite game
+				</p>
+				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+					<Suspense fallback={null}>
+						<SearchBar className="sm:max-w-md flex-1" />
+					</Suspense>
+					<Suspense fallback={null}>
+						<LuckyButton />
+					</Suspense>
+				</div>
+			</div>
+
+			<Suspense fallback={null}>
+				<Filters genres={genres} />
+			</Suspense>
+
+			<div className="flex items-center justify-between mb-4">
+				<p className="text-muted text-sm" aria-live="polite" aria-atomic="true">
+					{isLucky
+						? `Random pick from ${gamesData.count.toLocaleString()} games`
+						: `${gamesData.count.toLocaleString()} games found`}
+				</p>
+				<Suspense fallback={null}>
+					<SortSelect />
+				</Suspense>
+			</div>
+
+			<GameGrid games={gamesData.results} />
+
+			{totalPages > 1 && (
+				<Pagination
+					currentPage={page}
+					totalPages={totalPages}
+					searchParams={params}
+				/>
+			)}
+		</div>
+	);
 }
