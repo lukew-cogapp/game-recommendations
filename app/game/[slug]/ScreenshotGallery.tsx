@@ -31,6 +31,7 @@ export function ScreenshotGallery({
 							src={screenshot.image}
 							alt={`${gameName} screenshot`}
 							fill
+							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
 							className="object-cover hover:scale-105 transition-transform"
 						/>
 					</div>

@@ -3,13 +3,6 @@ import Link from "next/link";
 import type { Game } from "@/types/game";
 import { MetacriticBadge, PlatformBadge, UnreleasedBadge } from "./Badge";
 
-// Resize RAWG images by inserting crop dimensions into URL
-function getCroppedImageUrl(url: string, width = 600, height = 400): string {
-	if (!url) return url;
-	// Insert /crop/{w}/{h}/ after /media/
-	return url.replace("/media/", `/media/crop/${width}/${height}/`);
-}
-
 interface GameCardProps {
 	game: Game;
 }
