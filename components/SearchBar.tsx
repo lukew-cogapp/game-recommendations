@@ -103,7 +103,7 @@ export function SearchBar({
 					disabled={isPending || !query.trim()}
 					className="w-full min-[450px]:w-auto"
 				>
-					{isPending ? "..." : "Search"}
+					Search
 				</Button>
 			</form>
 		</search>
