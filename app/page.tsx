@@ -13,6 +13,7 @@
  * See GameGridWithLoadMore.tsx for client-side filtering implementation.
  */
 
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ActiveFilters } from "@/components/ActiveFilters";
 import { FilterSidebar } from "@/components/FilterSidebar";
@@ -25,29 +26,193 @@ import {
 	DEFAULT_PLATFORMS,
 	MULTIPLAYER_TAGS,
 	type MultiplayerMode,
+	PLATFORMS,
+	STORES,
+	TAG_PRESETS,
 } from "@/lib/constants";
 import { applyFilters, getTagGroups } from "@/lib/filters";
 import { getGames, getGenres } from "@/lib/rawg";
 import type { Game, GameOrdering, GamesResponse } from "@/types/game";
 
+type SearchParams = {
+	genre?: string;
+	ordering?: string;
+	page?: string;
+	dateFrom?: string;
+	dateTo?: string;
+	tags?: string;
+	matchAllTags?: string;
+	metacritic?: string;
+	platform?: string;
+	store?: string;
+	unreleased?: string;
+	lucky?: string;
+	multiplayer?: string;
+	search?: string;
+	searchExact?: string;
+};
+
+// Helper to join items with commas and "and" for the last item
+function naturalJoin(items: string[]): string {
+	if (items.length === 0) return "";
+	if (items.length === 1) return items[0];
+	if (items.length === 2) return `${items[0]} & ${items[1]}`;
+	return `${items.slice(0, -1).join(", ")} & ${items[items.length - 1]}`;
+}
+
+// Build dynamic metadata based on search params
+export async function generateMetadata({
+	searchParams,
+}: {
+	searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
+	const params = await searchParams;
+
+	// Search term takes priority
+	if (params.search) {
+		const title = `Results for "${params.search}" | Game Recommendations`;
+		const description = `Find games matching "${params.search}". Browse and filter by platform, genre, tags, and more.`;
+		return {
+			title,
+			description,
+			openGraph: { title, description },
+			twitter: { title, description },
+		};
+	}
+
+	// Collect filter info
+	const descriptors: string[] = [];
+	const filters: string[] = [];
+
+	// Multiplayer mode
+	if (params.multiplayer) {
+		const modeLabels: Record<string, string> = {
+			singleplayer: "Singleplayer",
+			coop: "Co-op",
+			local: "Local Multiplayer",
+		};
+		if (modeLabels[params.multiplayer]) {
+			descriptors.push(modeLabels[params.multiplayer]);
+		}
+	}
+
+	// Tags (up to 3 for title)
+	const matchedTags: string[] = [];
+	if (params.tags) {
+		const tagIds = new Set(params.tags.split(","));
+		for (const preset of TAG_PRESETS) {
+			const presetIds = preset.ids.split(",");
+			if (presetIds.every((id) => tagIds.has(id))) {
+				matchedTags.push(preset.label);
+			}
+		}
+		descriptors.push(...matchedTags.slice(0, 3));
+	}
+
+	// Genre
+	let genreName: string | null = null;
+	if (params.genre) {
+		const genres = await getGenres();
+		const genre = genres.find((g) => g.slug === params.genre);
+		if (genre) {
+			genreName = genre.name;
+			descriptors.push(genre.name);
+		}
+	}
+
+	// Platform
+	let platformName: string | null = null;
+	if (params.platform) {
+		const platform = PLATFORMS.find((p) => p.id.toString() === params.platform);
+		if (platform) {
+			platformName = platform.name;
+			filters.push(`on ${platform.name}`);
+		}
+	}
+
+	// Store
+	let storeName: string | null = null;
+	if (params.store) {
+		const store = STORES.find((s) => s.id.toString() === params.store);
+		if (store) {
+			storeName = store.name;
+			filters.push(`on ${store.name}`);
+		}
+	}
+
+	// Metacritic
+	if (params.metacritic) {
+		const [min] = params.metacritic.split(",");
+		if (min && min !== "1") {
+			filters.push(`rated ${min}+`);
+		}
+	}
+
+	// Unreleased
+	if (params.unreleased === "true") {
+		filters.push("upcoming releases");
+	}
+
+	// If no filters, return default
+	if (descriptors.length === 0 && filters.length === 0) {
+		return {
+			title: "Discover Games | Game Recommendations",
+			description:
+				"Browse and find your next favorite game. Filter by platform, genre, tags, Metacritic score, and more.",
+		};
+	}
+
+	// Build title: "Action RPG & CRPG Action Games on Steam | Game Recommendations"
+	let title = "";
+	if (descriptors.length > 0) {
+		title = `${naturalJoin(descriptors)} Games`;
+	} else {
+		title = "Games";
+	}
+	if (filters.length > 0) {
+		title += ` ${filters.join(", ")}`;
+	}
+	title += " | Game Recommendations";
+
+	// Build description with all details
+	const descParts: string[] = [];
+	if (matchedTags.length > 0) {
+		descParts.push(`tagged ${naturalJoin(matchedTags)}`);
+	}
+	if (genreName) {
+		descParts.push(`in the ${genreName} genre`);
+	}
+	if (platformName) {
+		descParts.push(`on ${platformName}`);
+	}
+	if (storeName) {
+		descParts.push(`available on ${storeName}`);
+	}
+	if (params.metacritic) {
+		const [min] = params.metacritic.split(",");
+		if (min && min !== "1") {
+			descParts.push(`with Metacritic scores of ${min}+`);
+		}
+	}
+	if (params.unreleased === "true") {
+		descParts.push("coming soon");
+	}
+
+	const description =
+		descParts.length > 0
+			? `Discover games ${descParts.join(", ")}. Find your next favorite game.`
+			: "Browse and find your next favorite game. Filter by platform, genre, tags, and more.";
+
+	return {
+		title,
+		description,
+		openGraph: { title, description },
+		twitter: { title, description },
+	};
+}
+
 interface HomeProps {
-	searchParams: Promise<{
-		genre?: string;
-		ordering?: string;
-		page?: string;
-		dateFrom?: string;
-		dateTo?: string;
-		tags?: string;
-		matchAllTags?: string;
-		metacritic?: string;
-		platform?: string;
-		store?: string;
-		unreleased?: string;
-		lucky?: string;
-		multiplayer?: string;
-		search?: string;
-		searchExact?: string;
-	}>;
+	searchParams: Promise<SearchParams>;
 }
 
 // Simple hash function for deterministic random from seed
