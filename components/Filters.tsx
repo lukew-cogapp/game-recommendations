@@ -246,17 +246,17 @@ export function Filters({ genres }: FiltersProps) {
 	);
 }
 
-export function SortSelect() {
+export function SortSelect({ id }: { id?: string }) {
 	const { currentOrdering, updateFilter } = useFilters();
 	const isMetacritic = currentOrdering === "-metacritic";
 
 	return (
 		<>
 			<select
+				id={id}
 				value={currentOrdering}
 				onChange={(e) => updateFilter("ordering", e.target.value)}
-				className="min-w-36 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer"
-				aria-label="Sort games by"
+				className="min-w-36 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold cursor-pointer"
 			>
 				{ORDERINGS.map((order) => (
 					<option key={order.value} value={order.value}>

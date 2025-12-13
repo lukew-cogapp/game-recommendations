@@ -7,9 +7,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
 	primary:
-		"bg-gold text-background hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed",
+		"bg-gold text-background hover:bg-gold-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:opacity-50 disabled:cursor-not-allowed",
 	secondary:
-		"bg-card border border-border text-foreground hover:bg-card-hover disabled:opacity-50 disabled:cursor-not-allowed",
+		"bg-card border border-border text-foreground hover:bg-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:opacity-50 disabled:cursor-not-allowed",
 };
 
 const sizeClasses = {

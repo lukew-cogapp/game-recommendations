@@ -16,7 +16,7 @@ interface FilterSidebarProps {
 }
 
 const sidebarSelectClassName =
-	"w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer";
+	"w-full px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold cursor-pointer";
 
 export function FilterSidebar({ genres }: FilterSidebarProps) {
 	const {

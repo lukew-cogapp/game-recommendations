@@ -87,7 +87,7 @@ export default async function Home({ searchParams }: HomeProps) {
 		dates = `1970-01-01,${oneYearFromNow}`;
 	}
 
-	const ordering = (params.ordering || "-rating") as GameOrdering;
+	const ordering = (params.ordering || "") as GameOrdering;
 
 	// When sorting by metacritic, ensure games have a score (avoid nulls first)
 	const metacriticFilter =
@@ -115,7 +115,7 @@ export default async function Home({ searchParams }: HomeProps) {
 	}
 
 	const baseFilters = {
-		ordering,
+		ordering: ordering || undefined, // Empty string = relevance (don't send to API)
 		genres: params.genre,
 		// Use selected platform or default to current-gen only
 		platforms: params.platform || DEFAULT_PLATFORMS,
@@ -224,9 +224,13 @@ export default async function Home({ searchParams }: HomeProps) {
 			<div className="mb-6">
 				<div className="flex items-center gap-3 mb-2">
 					<h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-						{params.search
-							? `Results for "${params.search}"`
-							: "Discover Games"}
+						{params.search ? (
+							`Results for "${params.search}"`
+						) : (
+							<a href="/" className="hover:text-gold transition-colors">
+								Discover Games
+							</a>
+						)}
 					</h1>
 					<span className="px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide bg-gold/20 text-gold rounded">
 						Alpha
@@ -280,9 +284,11 @@ export default async function Home({ searchParams }: HomeProps) {
 
 					<div className="flex items-center gap-4 mb-4">
 						<div className="flex items-center gap-2">
-							<span className="text-sm text-muted">Sort by</span>
+							<label htmlFor="sort-select" className="text-sm text-muted">
+								Sort by
+							</label>
 							<Suspense fallback={null}>
-								<SortSelect />
+								<SortSelect id="sort-select" />
 							</Suspense>
 						</div>
 						<p
@@ -290,9 +296,13 @@ export default async function Home({ searchParams }: HomeProps) {
 							aria-live="polite"
 							aria-atomic="true"
 						>
-							{isLucky
-								? `Random pick from ${gamesData.count.toLocaleString()} games`
-								: `${gamesData.count.toLocaleString()} games found`}
+							{(() => {
+								const count = gamesData.count.toLocaleString();
+								const label = gamesData.count === 1 ? "game" : "games";
+								return isLucky
+									? `Random pick from ${count} ${label}`
+									: `${count} ${label} found`;
+							})()}
 						</p>
 					</div>
 

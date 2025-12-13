@@ -106,7 +106,7 @@ export function TagPicker({
 				aria-expanded={isOpen}
 				aria-haspopup="listbox"
 				aria-label={`Filter by tags: ${getSelectedLabels()}`}
-				className={`${className || "w-full flex-1 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer"} flex items-center gap-2`}
+				className={`${className || "w-full flex-1 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold cursor-pointer"} flex items-center gap-2`}
 			>
 				<span className="truncate">{getSelectedLabels()}</span>
 				<svg

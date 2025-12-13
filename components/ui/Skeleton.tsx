@@ -34,7 +34,7 @@ export function GameCardSkeleton() {
 export function GameCardSkeletonGrid({ count = 8 }: { count?: number }) {
 	return (
 		<output
-			className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+			className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
 			aria-label="Loading games"
 		>
 			{[...Array(count)].map((_, i) => (

@@ -40,38 +40,40 @@ export type MultiplayerMode = keyof typeof MULTIPLAYER_TAGS | null;
 // IDs are combined where multiple tags represent the same concept
 // Note: Multiplayer is a separate filter, not in TAG_PRESETS
 export const TAG_PRESETS = [
-	// Genre
-	{ ids: "24,468", label: "RPG", category: "Genre" }, // rpg + role-playing
+	// Genre (alphabetized)
 	{ ids: "97", label: "Action RPG", category: "Genre" },
-	{ ids: "80,230", label: "Tactical", category: "Genre" }, // tactical + tactical-rpg
-	{ ids: "639", label: "Roguelike", category: "Genre" },
-	{ ids: "259", label: "Metroidvania", category: "Genre" },
 	{ ids: "213,180,49967", label: "City Builder", category: "Genre" }, // city-builder + base-building + colony-sim
-	{ ids: "1", label: "Survival", category: "Genre" },
-	{ ids: "37", label: "Sandbox", category: "Genre" },
 	{ ids: "107", label: "Family Friendly", category: "Genre" },
 	{ ids: "16,17", label: "Horror", category: "Genre" }, // horror + survival-horror
-	// Gameplay Style
-	{ ids: "36", label: "Open World", category: "Gameplay" },
-	{ ids: "102,175,101", label: "Turn-Based", category: "Gameplay" }, // turn-based + turn-based-combat + turn-based-strategy
-	{ ids: "99,61", label: "Isometric", category: "Gameplay" }, // isometric + top-down
-	{ ids: "6", label: "Exploration", category: "Gameplay" },
-	{ ids: "125", label: "Crafting", category: "Gameplay" },
-	{ ids: "49", label: "Difficult", category: "Gameplay" },
+	{ ids: "259", label: "Metroidvania", category: "Genre" },
+	{ ids: "639", label: "Roguelike", category: "Genre" },
+	{ ids: "24,468", label: "RPG", category: "Genre" }, // rpg + role-playing
+	{ ids: "37", label: "Sandbox", category: "Genre" },
+	{ ids: "580", label: "Souls-like", category: "Genre" },
+	{ ids: "1", label: "Survival", category: "Genre" },
+	{ ids: "80,230", label: "Tactical", category: "Genre" }, // tactical + tactical-rpg
+	// Gameplay (alphabetized)
 	{
 		ids: "115,336,29716,6670",
 		label: "Controller Support",
 		category: "Gameplay",
 	}, // controller + controller-support variants
-	// Setting/Theme
+	{ ids: "138,658", label: "Cozy", category: "Gameplay" }, // relaxing + cozy
+	{ ids: "125", label: "Crafting", category: "Gameplay" },
+	{ ids: "49", label: "Difficult", category: "Gameplay" },
+	{ ids: "6", label: "Exploration", category: "Gameplay" },
+	{ ids: "99,61", label: "Isometric", category: "Gameplay" }, // isometric + top-down
+	{ ids: "36", label: "Open World", category: "Gameplay" },
+	{ ids: "102,175,101", label: "Turn-Based", category: "Gameplay" }, // turn-based + turn-based-combat + turn-based-strategy
+	// Setting (alphabetized)
 	{ ids: "64,40", label: "Fantasy", category: "Setting" }, // fantasy + dark-fantasy
-	{ ids: "32,226", label: "Sci-fi", category: "Setting" }, // sci-fi + cyberpunk
 	{ ids: "43", label: "Post-apocalyptic", category: "Setting" },
+	{ ids: "32,226", label: "Sci-fi", category: "Setting" }, // sci-fi + cyberpunk
 	{ ids: "152", label: "Western", category: "Setting" },
-	// Narrative
-	{ ids: "118,583", label: "Story Rich", category: "Narrative" }, // story-rich + narrative
+	// Narrative (alphabetized)
 	{ ids: "13", label: "Atmospheric", category: "Narrative" },
 	{ ids: "145", label: "Choices Matter", category: "Narrative" },
+	{ ids: "118,583", label: "Story Rich", category: "Narrative" }, // story-rich + narrative
 ] as const;
 
 // Metacritic score presets
@@ -95,6 +97,7 @@ export const PLATFORMS = [
 export const DEFAULT_PLATFORMS = PLATFORMS.map((p) => p.id).join(",");
 
 export const ORDERINGS = [
+	{ value: "", label: "Relevance" },
 	{ value: "-rating", label: "Top Rated" },
 	{ value: "-metacritic", label: "Metacritic" },
 	{ value: "-released", label: "Release Date" },
