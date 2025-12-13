@@ -117,7 +117,7 @@ export function Filters({ genres }: FiltersProps) {
 
 	return (
 		<div className="space-y-3 mb-6">
-			<div className="flex flex-wrap items-center gap-2">
+			<div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
 				<select
 					value={currentPlatform}
 					onChange={(e) => updateFilter("platform", e.target.value)}
@@ -205,9 +205,9 @@ export function Filters({ genres }: FiltersProps) {
 					<button
 						type="button"
 						onClick={clearFilters}
-						className="px-3 py-2 text-sm text-muted hover:text-foreground transition-colors"
+						className="col-span-2 sm:col-auto flex-none px-3 py-2 text-sm text-muted hover:text-foreground transition-colors"
 					>
-						Clear
+						Clear All
 					</button>
 				)}
 			</div>
@@ -253,7 +253,7 @@ export function SortSelect() {
 		<select
 			value={currentOrdering}
 			onChange={(e) => updateFilter("ordering", e.target.value)}
-			className={selectClassName}
+			className="min-w-36 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-base sm:text-sm focus:outline-none focus:border-gold cursor-pointer"
 			aria-label="Sort games by"
 		>
 			{ORDERINGS.map((order) => (

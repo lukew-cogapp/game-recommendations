@@ -50,8 +50,8 @@ export function SearchBar({
 
 	return (
 		<search className={className}>
-			<form onSubmit={handleSubmit} className="flex items-center gap-2">
-				<div className="relative flex-1 flex items-center bg-card border border-border rounded-lg focus-within:border-gold focus-within:ring-1 focus-within:ring-gold transition-colors">
+			<form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
+				<div className="relative flex-1 basis-64 flex items-center bg-card border border-border rounded-lg focus-within:border-gold focus-within:ring-1 focus-within:ring-gold transition-colors">
 					<svg
 						className="absolute left-3 w-4 h-4 text-muted pointer-events-none"
 						fill="none"
@@ -86,7 +86,7 @@ export function SearchBar({
 							}
 						}}
 						placeholder={placeholder}
-						className="flex-1 px-4 py-2 pl-10 bg-transparent text-foreground placeholder-muted focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:h-4 [&::-webkit-search-cancel-button]:w-4 [&::-webkit-search-cancel-button]:cursor-pointer [&::-webkit-search-cancel-button]:bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a89a88%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M18%206L6%2018M6%206l12%2012%22%2F%3E%3C%2Fsvg%3E')]"
+						className="flex-1 px-4 py-2 pl-10 bg-transparent text-foreground text-base sm:text-sm placeholder-muted focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:h-4 [&::-webkit-search-cancel-button]:w-4 [&::-webkit-search-cancel-button]:cursor-pointer [&::-webkit-search-cancel-button]:bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a89a88%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M18%206L6%2018M6%206l12%2012%22%2F%3E%3C%2Fsvg%3E')]"
 					/>
 					<label className="flex items-center gap-1.5 px-3 border-l border-border cursor-pointer hover:bg-border/30 transition-colors">
 						<input
@@ -101,7 +101,7 @@ export function SearchBar({
 				<Button
 					type="submit"
 					disabled={isPending || !query.trim()}
-					className="shrink-0"
+					className="flex-1 sm:flex-none"
 				>
 					{isPending ? "..." : "Search"}
 				</Button>

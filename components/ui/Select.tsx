@@ -1,7 +1,7 @@
 import type { SelectHTMLAttributes } from "react";
 
 export const selectClassName =
-	"px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer";
+	"w-full flex-1 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-base sm:text-sm focus:outline-none focus:border-gold cursor-pointer";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 	label: string;
