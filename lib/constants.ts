@@ -74,7 +74,7 @@ export const TAG_PRESETS = [
 	// Narrative (alphabetized)
 	{ ids: "13", label: "Atmospheric", category: "Narrative" },
 	{ ids: "145", label: "Choices Matter", category: "Narrative" },
-	{ ids: "118,583", label: "Story Rich", category: "Narrative" }, // story-rich + narrative
+	{ ids: "118,583,42473,1998", label: "Story Rich", category: "Narrative" }, // story-rich + narrative + immersive-sim
 ] as const;
 
 // Metacritic score presets
