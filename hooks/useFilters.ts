@@ -6,6 +6,7 @@ import { useCallback } from "react";
 export type FilterKey =
 	| "genre"
 	| "platform"
+	| "store"
 	| "tags"
 	| "matchAllTags"
 	| "metacritic"
@@ -20,6 +21,7 @@ export function useFilters() {
 
 	const currentGenre = searchParams.get("genre") || "";
 	const currentPlatform = searchParams.get("platform") || "";
+	const currentStore = searchParams.get("store") || "";
 	const currentDateFrom = searchParams.get("dateFrom") || "";
 	const currentDateTo = searchParams.get("dateTo") || "";
 	const currentTags = searchParams.get("tags") || "";
@@ -41,6 +43,10 @@ export function useFilters() {
 				params.set(key, value);
 			} else {
 				params.delete(key);
+			}
+			// Reset store when platform changes (stores are platform-specific)
+			if (key === "platform") {
+				params.delete("store");
 			}
 			params.delete("page");
 			router.push(`/?${params.toString()}`);
@@ -110,6 +116,7 @@ export function useFilters() {
 		currentGenre ||
 		currentOrdering !== "-rating" ||
 		currentPlatform ||
+		currentStore ||
 		currentDateFrom ||
 		currentDateTo ||
 		currentTags ||
@@ -121,6 +128,7 @@ export function useFilters() {
 		// Current filter values
 		currentGenre,
 		currentPlatform,
+		currentStore,
 		currentDateFrom,
 		currentDateTo,
 		currentTags,

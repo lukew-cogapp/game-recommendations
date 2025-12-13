@@ -4,7 +4,9 @@ import { useFilters } from "@/hooks/useFilters";
 import {
 	METACRITIC_SCORES,
 	ORDERINGS,
+	PLATFORM_STORES,
 	PLATFORMS,
+	STORES,
 	TAG_PRESETS,
 } from "@/lib/constants";
 import type { Genre } from "@/types/game";
@@ -20,6 +22,7 @@ export function Filters({ genres }: FiltersProps) {
 	const {
 		currentGenre,
 		currentPlatform,
+		currentStore,
 		currentTags,
 		currentMatchAllTags,
 		currentMetacritic,
@@ -30,6 +33,14 @@ export function Filters({ genres }: FiltersProps) {
 		applyDatePreset,
 	} = useFilters();
 
+	// Filter stores based on selected platform
+	const availableStores = STORES.filter((store) => {
+		if (!currentPlatform) return true;
+		const platformId = Number.parseInt(currentPlatform, 10);
+		const compatibleStores = PLATFORM_STORES[platformId];
+		return !compatibleStores || compatibleStores.includes(store.id);
+	});
+
 	// Build active filter badges
 	const activeFilters: { label: string; onRemove: () => void }[] = [];
 
@@ -39,6 +50,16 @@ export function Filters({ genres }: FiltersProps) {
 			activeFilters.push({
 				label: platform.name,
 				onRemove: () => updateFilter("platform", ""),
+			});
+		}
+	}
+
+	if (currentStore) {
+		const store = STORES.find((s) => s.id.toString() === currentStore);
+		if (store) {
+			activeFilters.push({
+				label: store.name,
+				onRemove: () => updateFilter("store", ""),
 			});
 		}
 	}
@@ -107,6 +128,20 @@ export function Filters({ genres }: FiltersProps) {
 					{PLATFORMS.map((platform) => (
 						<option key={platform.id} value={platform.id.toString()}>
 							{platform.name}
+						</option>
+					))}
+				</select>
+
+				<select
+					value={currentStore}
+					onChange={(e) => updateFilter("store", e.target.value)}
+					className={selectClassName}
+					aria-label="Filter by store"
+				>
+					<option value="">All Stores</option>
+					{availableStores.map((store) => (
+						<option key={store.id} value={store.id.toString()}>
+							{store.name}
 						</option>
 					))}
 				</select>

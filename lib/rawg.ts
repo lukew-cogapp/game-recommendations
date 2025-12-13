@@ -1,4 +1,5 @@
 import type {
+	Game,
 	GameDetails,
 	GameFilters,
 	GamesResponse,
@@ -13,7 +14,7 @@ const API_KEY = process.env.RAWG_API_KEY;
 // Fetch with Next.js Data Cache - caches for 24 hours
 async function fetchRawg<T>(
 	endpoint: string,
-	params: Record<string, string | number | undefined> = {},
+	params: Record<string, string | number | boolean | undefined> = {},
 ): Promise<T> {
 	const searchParams = new URLSearchParams();
 	searchParams.set("key", API_KEY || "");
@@ -45,7 +46,9 @@ export async function getGames(
 		ordering: filters.ordering,
 		genres: filters.genres,
 		platforms: filters.platforms,
+		stores: filters.stores,
 		search: filters.search,
+		search_exact: filters.search_exact,
 		dates: filters.dates,
 		tags: filters.tags,
 		metacritic: filters.metacritic,
@@ -106,4 +109,10 @@ export async function getGameStores(
 export async function getGenres(): Promise<Genre[]> {
 	const response = await fetchRawg<GenresResponse>("/genres");
 	return response.results;
+}
+
+export async function getGameSeries(
+	slug: string,
+): Promise<{ results: Game[] }> {
+	return fetchRawg<{ results: Game[] }>(`/games/${slug}/game-series`);
 }

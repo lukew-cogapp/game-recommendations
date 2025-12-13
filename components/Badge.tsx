@@ -54,7 +54,12 @@ export function MetacriticBadge({
 	const baseVariant =
 		score >= 75 ? "success" : score >= 50 ? "warning" : "danger";
 	const variant = muted ? `${baseVariant}-muted` : baseVariant;
-	return <Badge variant={variant as BadgeProps["variant"]}>{score}</Badge>;
+	return (
+		<Badge variant={variant as BadgeProps["variant"]}>
+			<span className="sr-only">Metacritic score: </span>
+			{score}
+		</Badge>
+	);
 }
 
 export function UnreleasedBadge({ size = "sm" }: { size?: "sm" | "md" }) {

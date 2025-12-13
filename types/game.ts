@@ -85,7 +85,9 @@ export interface GameFilters {
 	ordering?: GameOrdering;
 	genres?: string;
 	platforms?: string;
+	stores?: string; // Comma-separated store IDs
 	search?: string;
+	search_exact?: boolean; // Mark search query as exact
 	dates?: string; // Format: "YYYY-MM-DD,YYYY-MM-DD"
 	tags?: string; // Comma-separated tag IDs
 	metacritic?: string; // Format: "min,max" e.g. "80,100"

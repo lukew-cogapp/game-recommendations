@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getGame, getGameScreenshots, getGameStores } from "@/lib/rawg";
+import { getGame, getGameStores } from "@/lib/rawg";
 import type { GameDetails } from "@/types/game";
 import { GameHero } from "./GameHero";
+import { GameSeries } from "./GameSeries";
 import { GameSidebar } from "./GameSidebar";
 import { ScreenshotGallery } from "./ScreenshotGallery";
 
@@ -20,10 +21,7 @@ export default async function GamePage({ params }: GamePageProps) {
 		notFound();
 	}
 
-	const [screenshots, stores] = await Promise.all([
-		getGameScreenshots(slug).catch(() => ({ results: [] })),
-		getGameStores(slug).catch(() => ({ results: [] })),
-	]);
+	const stores = await getGameStores(slug).catch(() => ({ results: [] }));
 
 	return (
 		<div>
@@ -47,10 +45,9 @@ export default async function GamePage({ params }: GamePageProps) {
 						</div>
 					</section>
 
-					<ScreenshotGallery
-						screenshots={screenshots.results}
-						gameName={game.name}
-					/>
+					<ScreenshotGallery slug={slug} gameName={game.name} />
+
+					<GameSeries slug={slug} currentGameId={game.id} />
 				</div>
 
 				<GameSidebar game={game} stores={stores.results} />

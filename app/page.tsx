@@ -39,10 +39,12 @@ interface HomeProps {
 		matchAllTags?: string;
 		metacritic?: string;
 		platform?: string;
+		store?: string;
 		unreleased?: string;
 		lucky?: string;
 		multiplayer?: string;
 		search?: string;
+		searchExact?: string;
 	}>;
 }
 
@@ -115,10 +117,12 @@ export default async function Home({ searchParams }: HomeProps) {
 		genres: params.genre,
 		// Use selected platform or default to current-gen only
 		platforms: params.platform || DEFAULT_PLATFORMS,
+		stores: params.store,
 		dates,
 		tags: apiTags,
 		metacritic: metacriticFilter,
 		search: params.search,
+		search_exact: params.searchExact === "true" || undefined,
 	};
 
 	// Generate hint for empty results

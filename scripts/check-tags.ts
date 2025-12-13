@@ -4,7 +4,7 @@ import { config } from "dotenv";
 // Load .env.local
 config({ path: resolve(process.cwd(), ".env.local") });
 
-const API_KEY = process.env.RAWG_API_KEY;
+const API_KEY = process.env.RAWG_API_KEY ?? "";
 
 if (!API_KEY) {
 	console.error("RAWG_API_KEY not found in .env.local");

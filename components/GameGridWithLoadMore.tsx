@@ -3,7 +3,7 @@
  *
  * This component handles:
  * 1. Displaying games in a grid layout
- * 2. "Load More" pagination via client-side API calls
+ * 2. "Load More" pagination via useSWRInfinite
  * 3. Client-side multiplayer filtering (when user tags + multiplayer are both selected)
  * 4. Client-side AND filtering for tag presets (when matchAllTags is enabled)
  * 5. Auto-fetching more results when filtered count drops below 8 games
@@ -19,21 +19,23 @@
 
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import useSWRInfinite from "swr/infinite";
 import type { MultiplayerMode } from "@/lib/constants";
+import { fetcher } from "@/lib/fetcher";
 import {
 	filterByMultiplayer,
 	filterByTagGroups,
 	getTagGroups,
 } from "@/lib/filters";
-import type { Game } from "@/types/game";
+import type { Game, GamesResponse } from "@/types/game";
 import { GameCard } from "./GameCard";
-import { EmptyState } from "./ui";
+import { Button, EmptyState, GameCardSkeletonGrid } from "./ui";
 
 interface GameGridWithLoadMoreProps {
 	initialGames: Game[];
 	initialCount: number;
-	filters: Record<string, string | undefined>;
+	filters: Record<string, string | boolean | undefined>;
 	selectedMultiplayerMode: MultiplayerMode;
 	/** Enable AND filtering between tag presets (OR within each preset) */
 	matchAllTags: boolean;
@@ -48,79 +50,124 @@ export function GameGridWithLoadMore({
 	matchAllTags,
 	emptyHint,
 }: GameGridWithLoadMoreProps) {
-	const [games, setGames] = useState<Game[]>(initialGames);
-	const [page, setPage] = useState(1);
-	const [isLoading, setIsLoading] = useState(false);
-	const [hasMore, setHasMore] = useState(initialGames.length < initialCount);
-
 	// Parse tag groups when matchAllTags is enabled
 	const tagGroups = useMemo(
-		() => (matchAllTags ? getTagGroups(filters.tags) : []),
+		() =>
+			matchAllTags
+				? getTagGroups(
+						typeof filters.tags === "string" ? filters.tags : undefined,
+					)
+				: [],
 		[matchAllTags, filters.tags],
 	);
 
-	// Reset state when initial data changes (e.g., filters/ordering changed)
-	useEffect(() => {
-		setGames(initialGames);
-		setPage(1);
-		setHasMore(initialGames.length < initialCount);
-	}, [initialGames, initialCount]);
+	// Determine page size based on filtering needs
+	const needsMoreResults = selectedMultiplayerMode || tagGroups.length > 0;
+	const pageSize = needsMoreResults ? 100 : 20;
 
-	// Apply filtering to displayed games
-	const filteredGames = filterByTagGroups(
-		filterByMultiplayer(games, selectedMultiplayerMode),
-		tagGroups,
-	);
+	// Build query string from filters
+	const buildQueryString = (pageIndex: number) => {
+		const params = new URLSearchParams();
+		for (const [key, value] of Object.entries(filters)) {
+			if (value !== undefined && value !== false) {
+				params.set(key, String(value));
+			}
+		}
+		params.set("page", String(pageIndex + 1)); // SWR uses 0-indexed, API uses 1-indexed
+		params.set("page_size", String(pageSize));
+		return params.toString();
+	};
 
-	const loadMore = useCallback(async () => {
-		setIsLoading(true);
+	// SWR Infinite key function
+	const getKey = (
+		pageIndex: number,
+		previousPageData: GamesResponse | null,
+	) => {
+		// Stop fetching if we've reached the end
+		if (previousPageData && !previousPageData.next) return null;
+		// Stop after 20 pages to avoid excessive API calls
+		if (pageIndex >= 20) return null;
+		return `/api/games?${buildQueryString(pageIndex)}`;
+	};
 
-		try {
-			const nextPage = page + 1;
-			// Fetch more when client-side filtering is active
-			const needsMoreResults = selectedMultiplayerMode || tagGroups.length > 0;
-			const pageSize = needsMoreResults ? 100 : 20;
-			const params = new URLSearchParams();
+	const {
+		data: pages,
+		error,
+		isLoading,
+		isValidating,
+		size,
+		setSize,
+	} = useSWRInfinite<GamesResponse>(getKey, fetcher, {
+		fallbackData: [
+			{
+				count: initialCount,
+				next: initialCount > pageSize ? "more" : null,
+				previous: null,
+				results: initialGames,
+			},
+		],
+		revalidateFirstPage: false,
+		revalidateOnFocus: false,
+	});
 
-			// Add all current filters
-			for (const [key, value] of Object.entries(filters)) {
-				if (value) {
-					params.set(key, value);
+	// Flatten all pages into a single array of unique games
+	const allGames = useMemo(() => {
+		if (!pages) return [];
+		const seen = new Set<number>();
+		const games: Game[] = [];
+		for (const page of pages) {
+			for (const game of page.results) {
+				if (!seen.has(game.id)) {
+					seen.add(game.id);
+					games.push(game);
 				}
 			}
-			params.set("page", String(nextPage));
-			params.set("page_size", String(pageSize));
-
-			const response = await fetch(`/api/games?${params.toString()}`);
-			if (!response.ok) throw new Error("Failed to fetch games");
-
-			const data = await response.json();
-
-			setGames((prev) => {
-				const existingIds = new Set(prev.map((g) => g.id));
-				const newGames = data.results.filter(
-					(g: Game) => !existingIds.has(g.id),
-				);
-				return [...prev, ...newGames];
-			});
-			setPage(nextPage);
-			setHasMore(data.next !== null);
-		} catch (error) {
-			console.error("Error loading more games:", error);
-		} finally {
-			setIsLoading(false);
 		}
-	}, [page, filters, selectedMultiplayerMode, tagGroups]);
+		return games;
+	}, [pages]);
+
+	// Apply client-side filtering
+	const filteredGames = useMemo(
+		() =>
+			filterByTagGroups(
+				filterByMultiplayer(allGames, selectedMultiplayerMode),
+				tagGroups,
+			),
+		[allGames, selectedMultiplayerMode, tagGroups],
+	);
+
+	// Check if there are more pages to load
+	const lastPage = pages?.[pages.length - 1];
+	const hasMore = lastPage?.next !== null && size < 20;
 
 	// Auto-fetch more if filtered results are below minimum threshold
-	// Stop after 20 pages to avoid excessive API calls
 	useEffect(() => {
-		if (filteredGames.length < 8 && hasMore && !isLoading && page < 20) {
-			loadMore();
+		if (filteredGames.length < 8 && hasMore && !isValidating) {
+			setSize((s) => s + 1);
 		}
-	}, [filteredGames.length, hasMore, isLoading, loadMore, page]);
+	}, [filteredGames.length, hasMore, isValidating, setSize]);
 
-	if (filteredGames.length === 0 && !isLoading) {
+	const loadMore = () => {
+		if (!isValidating && hasMore) {
+			setSize((s) => s + 1);
+		}
+	};
+
+	// Show skeleton on initial load only
+	if (isLoading && !pages) {
+		return <GameCardSkeletonGrid count={8} />;
+	}
+
+	if (error) {
+		return (
+			<div className="text-center py-12">
+				<p className="text-red-400 mb-4">Failed to load games</p>
+				<Button onClick={() => setSize(1)}>Try Again</Button>
+			</div>
+		);
+	}
+
+	if (filteredGames.length === 0 && !isValidating) {
 		return <EmptyState hint={emptyHint} />;
 	}
 
@@ -134,21 +181,16 @@ export function GameGridWithLoadMore({
 
 			{hasMore && (
 				<div className="mt-8 text-center">
-					<button
-						type="button"
-						onClick={loadMore}
-						disabled={isLoading}
-						className="px-6 py-3 bg-gold text-background font-medium rounded-lg hover:bg-gold-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						{isLoading ? "Loading..." : "Load More"}
-					</button>
+					<Button size="lg" onClick={loadMore} disabled={isValidating}>
+						{isValidating ? "Loading..." : "Load More"}
+					</Button>
 				</div>
 			)}
 
 			{(selectedMultiplayerMode || tagGroups.length > 0) &&
-				filteredGames.length < games.length && (
+				filteredGames.length < allGames.length && (
 					<p className="mt-4 text-center text-sm text-muted">
-						{games.length - filteredGames.length} games filtered by{" "}
+						{allGames.length - filteredGames.length} games filtered by{" "}
 						{selectedMultiplayerMode && tagGroups.length
 							? "multiplayer and tag"
 							: selectedMultiplayerMode

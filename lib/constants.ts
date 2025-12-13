@@ -128,3 +128,22 @@ export const STORE_INFO: Record<number, { name: string; slug: string }> = {
 	9: { name: "itch.io", slug: "itch" },
 	11: { name: "Epic Games", slug: "epic" },
 };
+
+// Store options for filtering (most relevant stores for game discovery)
+export const STORES = [
+	{ id: 1, name: "Steam" },
+	{ id: 11, name: "Epic Games" },
+	{ id: 5, name: "GOG" },
+	{ id: 3, name: "PlayStation Store" },
+	{ id: 2, name: "Xbox Store" },
+	{ id: 6, name: "Nintendo Store" },
+	{ id: 9, name: "itch.io" },
+] as const;
+
+// Map platform IDs to compatible store IDs
+export const PLATFORM_STORES: Record<number, number[]> = {
+	4: [1, 11, 5, 9], // PC → Steam, Epic, GOG, itch.io
+	187: [3], // PlayStation 5 → PlayStation Store
+	186: [2], // Xbox Series S/X → Xbox Store
+	7: [6], // Nintendo Switch → Nintendo Store
+};

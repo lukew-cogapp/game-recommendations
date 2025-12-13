@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { Suspense } from "react";
-import { SearchBar } from "@/components/SearchBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,20 +35,15 @@ export default function RootLayout({
 				>
 					Skip to main content
 				</a>
-				<header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border">
+				<header className="sm:sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border">
 					<nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<div className="flex items-center justify-between h-16 gap-4">
+						<div className="flex items-center h-16">
 							<Link
 								href="/"
-								className="flex-shrink-0 text-xl font-bold text-gold hover:text-gold-hover transition-colors"
+								className="text-xl font-bold text-gold hover:text-gold-hover transition-colors"
 							>
 								GameFinder
 							</Link>
-							<div className="flex-1 max-w-xl">
-								<Suspense fallback={null}>
-									<SearchBar />
-								</Suspense>
-							</div>
 						</div>
 					</nav>
 				</header>
