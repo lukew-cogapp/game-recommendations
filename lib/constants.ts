@@ -45,12 +45,17 @@ export const TAG_PRESETS = [
 	{ ids: "213,180,49967", label: "City Builder", category: "Genre" }, // city-builder + base-building + colony-sim
 	{ ids: "238", label: "CRPG", category: "Genre" },
 	{ ids: "107", label: "Family Friendly", category: "Genre" },
-	{ ids: "16,17", label: "Horror", category: "Genre" }, // horror + survival-horror
+	{ ids: "68", label: "Hack and Slash", category: "Genre" },
+	{ ids: "16,17,63", label: "Horror", category: "Genre" }, // horror + survival-horror + zombies
+	{ ids: "42473,1998", label: "Immersive Sim", category: "Genre" },
+	{ ids: "233", label: "JRPG", category: "Genre" },
 	{ ids: "259", label: "Metroidvania", category: "Genre" },
+	{ ids: "141", label: "Point & Click", category: "Genre" },
 	{ ids: "639", label: "Roguelike", category: "Genre" },
 	{ ids: "24,468", label: "RPG", category: "Genre" }, // rpg + role-playing
 	{ ids: "37", label: "Sandbox", category: "Genre" },
 	{ ids: "580", label: "Souls-like", category: "Genre" },
+	{ ids: "15", label: "Stealth", category: "Genre" },
 	{ ids: "1", label: "Survival", category: "Genre" },
 	{ ids: "80,230", label: "Tactical", category: "Genre" }, // tactical + tactical-rpg
 	// Gameplay (alphabetized)
@@ -67,14 +72,16 @@ export const TAG_PRESETS = [
 	{ ids: "36", label: "Open World", category: "Gameplay" },
 	{ ids: "102,175,101", label: "Turn-Based", category: "Gameplay" }, // turn-based + turn-based-combat + turn-based-strategy
 	// Setting (alphabetized)
+	{ ids: "134", label: "Anime", category: "Setting" },
 	{ ids: "64,40", label: "Fantasy", category: "Setting" }, // fantasy + dark-fantasy
 	{ ids: "43", label: "Post-apocalyptic", category: "Setting" },
-	{ ids: "32,226", label: "Sci-fi", category: "Setting" }, // sci-fi + cyberpunk
+	{ ids: "122,74", label: "Retro/Pixel", category: "Setting" }, // pixel-graphics + retro
+	{ ids: "32,226,25", label: "Sci-fi", category: "Setting" }, // sci-fi + cyberpunk + space
 	{ ids: "152", label: "Western", category: "Setting" },
 	// Narrative (alphabetized)
-	{ ids: "13", label: "Atmospheric", category: "Narrative" },
+	{ ids: "13,41", label: "Atmospheric", category: "Narrative" }, // atmospheric + dark
 	{ ids: "145", label: "Choices Matter", category: "Narrative" },
-	{ ids: "118,583,42473,1998", label: "Story Rich", category: "Narrative" }, // story-rich + narrative + immersive-sim
+	{ ids: "118,583,117", label: "Story Rich", category: "Narrative" }, // story-rich + narrative + mystery
 ] as const;
 
 // Metacritic score presets
