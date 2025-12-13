@@ -22,10 +22,30 @@ export function LuckyButton() {
 		router.push(`/?${params.toString()}`);
 	};
 
+	const DiceIcon = () => (
+		<svg
+			className="w-4 h-4"
+			fill="none"
+			stroke="currentColor"
+			viewBox="0 0 24 24"
+			aria-hidden="true"
+		>
+			<rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+			<circle cx="8" cy="8" r="1.5" fill="currentColor" stroke="none" />
+			<circle cx="16" cy="8" r="1.5" fill="currentColor" stroke="none" />
+			<circle cx="8" cy="16" r="1.5" fill="currentColor" stroke="none" />
+			<circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none" />
+			<circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+		</svg>
+	);
+
 	if (isLucky) {
 		return (
 			<div className="flex gap-2">
-				<Button onClick={handleClick}>Try Another</Button>
+				<Button onClick={handleClick}>
+					<DiceIcon />
+					Try Another
+				</Button>
 				<Button variant="secondary" onClick={handleClear}>
 					Show All
 				</Button>
@@ -33,5 +53,10 @@ export function LuckyButton() {
 		);
 	}
 
-	return <Button onClick={handleClick}>I'm Feeling Lucky</Button>;
+	return (
+		<Button onClick={handleClick}>
+			<DiceIcon />
+			I'm Feeling Lucky
+		</Button>
+	);
 }

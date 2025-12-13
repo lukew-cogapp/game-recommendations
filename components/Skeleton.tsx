@@ -29,19 +29,33 @@ export function GameGridSkeleton({ count = 8 }: { count?: number }) {
 
 export function FiltersSkeleton() {
 	return (
-		<div className="space-y-4 mb-8 animate-pulse">
-			<div className="flex flex-wrap gap-2">
-				<div className="h-9 w-28 bg-card border border-border rounded-lg" />
-				<div className="h-9 w-24 bg-card border border-border rounded-lg" />
-				<div className="h-9 w-28 bg-card border border-border rounded-lg" />
-				<div className="h-9 w-24 bg-card border border-border rounded-lg" />
-				<div className="h-9 w-32 bg-card border border-border rounded-lg" />
+		<div className="space-y-3 mb-6 animate-pulse">
+			<div className="grid grid-cols-2 min-[900px]:flex min-[900px]:flex-wrap gap-2">
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
+				<div className="h-10 bg-card border border-border rounded-lg" />
 			</div>
-			<div className="flex flex-wrap gap-2 items-center">
-				<div className="h-4 w-16 bg-border rounded" />
-				<div className="h-9 w-36 bg-card border border-border rounded-lg" />
-				<div className="h-4 w-2 bg-border rounded" />
-				<div className="h-9 w-36 bg-card border border-border rounded-lg" />
+		</div>
+	);
+}
+
+export function FilterSidebarSkeleton() {
+	return (
+		<div className="space-y-4 animate-pulse">
+			<div className="flex items-center justify-between">
+				<div className="h-4 w-12 bg-border rounded" />
+			</div>
+			<div className="space-y-3">
+				{Array.from({ length: 7 }).map((_, i) => (
+					<div key={i}>
+						<div className="h-3 w-16 bg-border rounded mb-1.5" />
+						<div className="h-10 bg-card border border-border rounded-lg" />
+					</div>
+				))}
 			</div>
 		</div>
 	);

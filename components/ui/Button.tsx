@@ -29,7 +29,7 @@ export function Button({
 	return (
 		<button
 			type={type}
-			className={`font-medium rounded-lg transition-colors ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+			className={`inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
 			{...props}
 		>
 			{children}

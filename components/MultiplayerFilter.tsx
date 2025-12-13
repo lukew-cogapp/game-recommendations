@@ -11,7 +11,12 @@ const OPTIONS: { value: MultiplayerMode; label: string }[] = [
 	{ value: "local", label: "Local Multiplayer" },
 ];
 
-export function MultiplayerFilter() {
+interface MultiplayerFilterProps {
+	className?: string;
+	id?: string;
+}
+
+export function MultiplayerFilter({ className, id }: MultiplayerFilterProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const current = (searchParams.get("multiplayer") as MultiplayerMode) || null;
@@ -31,9 +36,11 @@ export function MultiplayerFilter() {
 
 	return (
 		<Select
+			id={id}
 			value={current || ""}
 			onChange={handleChange}
 			label="Filter by player mode"
+			className={className}
 		>
 			{OPTIONS.map((option) => (
 				<option key={option.value || "all"} value={option.value || ""}>

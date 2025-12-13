@@ -8,6 +8,8 @@ interface TagPickerProps {
 	onChange: (tags: string) => void;
 	matchAll: boolean;
 	onMatchAllChange: (matchAll: boolean) => void;
+	className?: string;
+	id?: string;
 }
 
 // Group tags by category
@@ -29,6 +31,8 @@ export function TagPicker({
 	onChange,
 	matchAll,
 	onMatchAllChange,
+	className,
+	id,
 }: TagPickerProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
@@ -96,12 +100,13 @@ export function TagPicker({
 		<div ref={ref} className="relative">
 			<button
 				type="button"
+				id={id}
 				onClick={() => setIsOpen(!isOpen)}
 				onKeyDown={handleKeyDown}
 				aria-expanded={isOpen}
 				aria-haspopup="listbox"
 				aria-label={`Filter by tags: ${getSelectedLabels()}`}
-				className="w-full flex-1 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer flex items-center gap-2"
+				className={`${className || "w-full flex-1 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer"} flex items-center gap-2`}
 			>
 				<span className="truncate">{getSelectedLabels()}</span>
 				<svg

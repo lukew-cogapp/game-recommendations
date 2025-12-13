@@ -14,6 +14,8 @@
  */
 
 import { Suspense } from "react";
+import { ActiveFilters } from "@/components/ActiveFilters";
+import { FilterSidebar } from "@/components/FilterSidebar";
 import { Filters, SortSelect } from "@/components/Filters";
 import { GameGrid } from "@/components/GameGrid";
 import { GameGridWithLoadMore } from "@/components/GameGridWithLoadMore";
@@ -218,7 +220,8 @@ export default async function Home({ searchParams }: HomeProps) {
 
 	return (
 		<div>
-			<div className="mb-8">
+			{/* Header - full width above sidebar */}
+			<div className="mb-6">
 				<div className="flex items-center gap-3 mb-2">
 					<h1 className="text-3xl sm:text-4xl font-bold text-foreground">
 						{params.search
@@ -229,50 +232,88 @@ export default async function Home({ searchParams }: HomeProps) {
 						Alpha
 					</span>
 				</div>
-				<p className="text-muted mb-4">
+				<p className="text-muted">
 					{params.search
 						? "Refine with filters below"
 						: "Browse and find your next favorite game"}
 				</p>
-				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-					<Suspense fallback={null}>
-						<SearchBar className="sm:max-w-md flex-1" />
-					</Suspense>
-					<Suspense fallback={null}>
-						<LuckyButton />
-					</Suspense>
+			</div>
+
+			{/* Sidebar + Main content */}
+			<div className="flex flex-col lg:flex-row gap-8">
+				{/* Sidebar - Desktop only */}
+				<div className="hidden lg:block w-56 flex-shrink-0">
+					<div className="sticky top-8">
+						<Suspense fallback={null}>
+							<FilterSidebar genres={genres} />
+						</Suspense>
+					</div>
+				</div>
+
+				{/* Main content */}
+				<div className="flex-1 min-w-0">
+					<h2 className="hidden lg:block text-sm font-semibold text-foreground uppercase tracking-wide mb-3">
+						Search
+					</h2>
+					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
+						<Suspense fallback={null}>
+							<SearchBar className="sm:max-w-xl flex-1" />
+						</Suspense>
+						<Suspense fallback={null}>
+							<LuckyButton />
+						</Suspense>
+					</div>
+
+					{/* Active filters - Desktop only */}
+					<div className="hidden lg:block mb-6">
+						<Suspense fallback={null}>
+							<ActiveFilters genres={genres} />
+						</Suspense>
+					</div>
+
+					{/* Mobile/Tablet filters */}
+					<div className="lg:hidden">
+						<Suspense fallback={null}>
+							<Filters genres={genres} />
+						</Suspense>
+					</div>
+
+					<div className="flex items-center justify-between mb-4">
+						<p
+							className="text-muted text-sm"
+							aria-live="polite"
+							aria-atomic="true"
+						>
+							{isLucky
+								? `Random pick from ${gamesData.count.toLocaleString()} games`
+								: `${gamesData.count.toLocaleString()} games found`}
+						</p>
+						<Suspense fallback={null}>
+							<SortSelect />
+						</Suspense>
+					</div>
+
+					{isLucky ? (
+						<GameGrid
+							games={gamesData.results}
+							emptyHint={getLuckyEmptyHint()}
+						/>
+					) : (
+						<GameGridWithLoadMore
+							initialGames={gamesData.results}
+							initialCount={gamesData.count}
+							filters={baseFilters}
+							selectedMultiplayerMode={
+								needsClientSideMultiplayerFilter
+									? selectedMultiplayerMode
+									: null
+							}
+							matchAllTags={needsClientSideTagFilter}
+							emptyHint={getEmptyHint()}
+						/>
+					)}
 				</div>
 			</div>
-
-			<Suspense fallback={null}>
-				<Filters genres={genres} />
-			</Suspense>
-
-			<div className="flex items-center justify-between mb-4">
-				<p className="text-muted text-sm" aria-live="polite" aria-atomic="true">
-					{isLucky
-						? `Random pick from ${gamesData.count.toLocaleString()} games`
-						: `${gamesData.count.toLocaleString()} games found`}
-				</p>
-				<Suspense fallback={null}>
-					<SortSelect />
-				</Suspense>
-			</div>
-
-			{isLucky ? (
-				<GameGrid games={gamesData.results} emptyHint={getLuckyEmptyHint()} />
-			) : (
-				<GameGridWithLoadMore
-					initialGames={gamesData.results}
-					initialCount={gamesData.count}
-					filters={baseFilters}
-					selectedMultiplayerMode={
-						needsClientSideMultiplayerFilter ? selectedMultiplayerMode : null
-					}
-					matchAllTags={needsClientSideTagFilter}
-					emptyHint={getEmptyHint()}
-				/>
-			)}
 		</div>
 	);
 }
