@@ -248,19 +248,27 @@ export function Filters({ genres }: FiltersProps) {
 
 export function SortSelect() {
 	const { currentOrdering, updateFilter } = useFilters();
+	const isMetacritic = currentOrdering === "-metacritic";
 
 	return (
-		<select
-			value={currentOrdering}
-			onChange={(e) => updateFilter("ordering", e.target.value)}
-			className="min-w-36 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer"
-			aria-label="Sort games by"
-		>
-			{ORDERINGS.map((order) => (
-				<option key={order.value} value={order.value}>
-					{order.label}
-				</option>
-			))}
-		</select>
+		<>
+			<select
+				value={currentOrdering}
+				onChange={(e) => updateFilter("ordering", e.target.value)}
+				className="min-w-36 px-3 py-2 bg-card border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-gold cursor-pointer"
+				aria-label="Sort games by"
+			>
+				{ORDERINGS.map((order) => (
+					<option key={order.value} value={order.value}>
+						{order.label}
+					</option>
+				))}
+			</select>
+			{isMetacritic && (
+				<span className="text-xs text-muted italic">
+					Scores may be delayed for recent releases
+				</span>
+			)}
+		</>
 	);
 }

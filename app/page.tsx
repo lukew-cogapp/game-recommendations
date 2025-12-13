@@ -278,7 +278,13 @@ export default async function Home({ searchParams }: HomeProps) {
 						</Suspense>
 					</div>
 
-					<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-4 mb-4">
+						<div className="flex items-center gap-2">
+							<span className="text-sm text-muted">Sort by</span>
+							<Suspense fallback={null}>
+								<SortSelect />
+							</Suspense>
+						</div>
 						<p
 							className="text-muted text-sm"
 							aria-live="polite"
@@ -288,9 +294,6 @@ export default async function Home({ searchParams }: HomeProps) {
 								? `Random pick from ${gamesData.count.toLocaleString()} games`
 								: `${gamesData.count.toLocaleString()} games found`}
 						</p>
-						<Suspense fallback={null}>
-							<SortSelect />
-						</Suspense>
 					</div>
 
 					{isLucky ? (

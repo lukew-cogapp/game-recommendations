@@ -35,10 +35,13 @@ export default function Loading() {
 						<FiltersSkeleton />
 					</div>
 
-					{/* Results count + sort skeleton */}
-					<div className="flex items-center justify-between mb-4 animate-pulse">
+					{/* Sort + results count skeleton */}
+					<div className="flex items-center gap-4 mb-4 animate-pulse">
+						<div className="flex items-center gap-2">
+							<div className="h-4 w-14 bg-border rounded" />
+							<div className="h-10 w-36 bg-card border border-border rounded-lg" />
+						</div>
 						<div className="h-4 w-32 bg-border rounded" />
-						<div className="h-10 w-36 bg-card border border-border rounded-lg" />
 					</div>
 
 					<GameGridSkeleton count={8} />
