@@ -43,6 +43,7 @@ export const TAG_PRESETS = [
 	// Genre (alphabetized)
 	{ ids: "97", label: "Action RPG", category: "Genre" },
 	{ ids: "213,180,49967", label: "City Builder", category: "Genre" }, // city-builder + base-building + colony-sim
+	{ ids: "238", label: "CRPG", category: "Genre" },
 	{ ids: "107", label: "Family Friendly", category: "Genre" },
 	{ ids: "16,17", label: "Horror", category: "Genre" }, // horror + survival-horror
 	{ ids: "259", label: "Metroidvania", category: "Genre" },
