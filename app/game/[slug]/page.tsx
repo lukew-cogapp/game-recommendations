@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGame, getGameStores } from "@/lib/rawg";
@@ -9,6 +10,49 @@ import { ScreenshotGallery } from "./ScreenshotGallery";
 
 interface GamePageProps {
 	params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+	params,
+}: GamePageProps): Promise<Metadata> {
+	const { slug } = await params;
+
+	try {
+		const game = await getGame(slug);
+		const description =
+			game.description_raw?.slice(0, 160) ||
+			`${game.name} - View details, screenshots, and where to buy.`;
+
+		return {
+			title: game.name,
+			description,
+			openGraph: {
+				title: game.name,
+				description,
+				images: game.background_image
+					? [
+							{
+								url: game.background_image,
+								width: 1200,
+								height: 630,
+								alt: game.name,
+							},
+						]
+					: [],
+				type: "website",
+			},
+			twitter: {
+				card: "summary_large_image",
+				title: game.name,
+				description,
+				images: game.background_image ? [game.background_image] : [],
+			},
+		};
+	} catch {
+		return {
+			title: "Game Not Found",
+		};
+	}
 }
 
 export default async function GamePage({ params }: GamePageProps) {

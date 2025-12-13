@@ -219,9 +219,16 @@ export default async function Home({ searchParams }: HomeProps) {
 	return (
 		<div>
 			<div className="mb-8">
-				<h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-					{params.search ? `Results for "${params.search}"` : "Discover Games"}
-				</h1>
+				<div className="flex items-center gap-3 mb-2">
+					<h1 className="text-3xl sm:text-4xl font-bold text-foreground">
+						{params.search
+							? `Results for "${params.search}"`
+							: "Discover Games"}
+					</h1>
+					<span className="px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide bg-gold/20 text-gold rounded">
+						Alpha
+					</span>
+				</div>
 				<p className="text-muted mb-4">
 					{params.search
 						? "Refine with filters below"
